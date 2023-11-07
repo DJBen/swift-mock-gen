@@ -19,7 +19,7 @@ import WinSDK
 
 fileprivate func withTemporaryFile<T>(contents: [UInt8], body: (URL) throws -> T) throws -> T {
   var tempFileURL = FileManager.default.temporaryDirectory
-  tempFileURL.appendPathComponent("swift-parser-cli-\(UUID().uuidString).swift")
+  tempFileURL.appendPathComponent("swift-mock-gen-\(UUID().uuidString).swift")
   try Data(contents).write(to: tempFileURL)
   defer {
     try? FileManager.default.removeItem(at: tempFileURL)
@@ -64,13 +64,13 @@ struct Reduce: ParsableCommand {
     case potentialCrash
   }
 
-  /// Invoke `swift-parser-cli verify-round-trip` with the same arguments as this `reduce` subcommand.
+  /// Invoke `swift-mock-gen verify-round-trip` with the same arguments as this `reduce` subcommand.
   /// Returns the exit code of the invocation.
   private func runVerifyRoundTripInSeparateProcess(source: [UInt8]) throws -> ProcessExit {
     #if os(iOS) || os(tvOS) || os(watchOS)
     // We cannot launch a new process on iOS-like platforms.
     // Default to running verification in-process.
-    // Honestly, this isn't very important because you can't launch swift-parser-cli
+    // Honestly, this isn't very important because you can't launch swift-mock-gen
     // on iOS anyway but this fixes a compilation error of the pacakge on iOS.
     return try runVerifyRoundTripInCurrentProcess(source: source) ? ProcessExit.success : ProcessExit.potentialCrash
     #else
