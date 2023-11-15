@@ -10,7 +10,7 @@ let package = Package(
   ],
   products: [
     .executable(name: "swift-mock-gen", targets: ["swift-mock-gen"]),
-    .library(name: "MockTestSupport", targets: ["MockTestSupport"]),
+    .library(name: "MockSupport", targets: ["MockSupport"]),
   ],
   dependencies: [
     .package(url: "https://github.com/apple/swift-argument-parser.git", from: "1.2.2"),
@@ -22,7 +22,7 @@ let package = Package(
     ),
 
     .target(
-      name: "MockTestSupport"
+      name: "MockSupport"
     ),
 
     .target(
