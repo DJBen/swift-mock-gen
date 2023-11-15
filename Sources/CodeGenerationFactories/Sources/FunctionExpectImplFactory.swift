@@ -71,12 +71,12 @@ public struct FunctionExpectImplFactory {
                 let paramString = params.joined(separator: ",\n")
                 DeclSyntax(
                 #"""
-                let stub = Stub_performRequest(
+                let stub = Stub_\#(protocolFunctionDeclaration.name)(
                 \#(raw: paramString)
                 )
                 """#
                 )
-                ExprSyntax(#"expectations_performRequest.append((stub, expectation))"#)
+                ExprSyntax(#"expectations_\#(protocolFunctionDeclaration.name).append((stub, expectation))"#)
             }
         )
         .with(\.leadingTrivia, [.newlines(2)])

@@ -161,12 +161,12 @@ final class MockClassFactoryTests: XCTestCase {
                 }
             
                 public func expect_initialize(name: Matching<String>, secondName: Matching<String?>, expectation: Expectation?) {
-                    let stub = Stub_performRequest(
+                    let stub = Stub_initialize(
                         name: name,
                         secondName: secondName,
                         returnValue: value
                     )
-                    expectations_performRequest.append((stub, expectation))
+                    expectations_initialize.append((stub, expectation))
                 }
             
                 public func verify_initialize() {
@@ -194,7 +194,7 @@ final class MockClassFactoryTests: XCTestCase {
                 public struct Stub_fetchConfig {
                     let returnValue: [String: String]
                     func matches(_ invocation: Invocation_fetchConfig) -> Bool {
-                        return
+                        return true
                     }
                 }
                 public struct Invocation_fetchConfig {
@@ -221,10 +221,10 @@ final class MockClassFactoryTests: XCTestCase {
                 }
             
                 public func expect_fetchConfig(andReturn value: String, expectation: Expectation?) {
-                    let stub = Stub_performRequest(
+                    let stub = Stub_fetchConfig(
                         returnValue: value
                     )
-                    expectations_performRequest.append((stub, expectation))
+                    expectations_fetchConfig.append((stub, expectation))
                 }
             
                 public func verify_fetchConfig() {
@@ -284,11 +284,11 @@ final class MockClassFactoryTests: XCTestCase {
                 }
             
                 public func expect_fetchData(name: Matching<(String, count: Int)>, andReturn value: String, expectation: Expectation?) {
-                    let stub = Stub_performRequest(
+                    let stub = Stub_fetchData(
                         name: name,
                         returnValue: value
                     )
-                    expectations_performRequest.append((stub, expectation))
+                    expectations_fetchData.append((stub, expectation))
                 }
             
                 public func verify_fetchData() {

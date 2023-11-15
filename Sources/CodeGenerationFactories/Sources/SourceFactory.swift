@@ -4,10 +4,10 @@ import SwiftSyntax
 import SwiftSyntaxBuilder
 
 public struct SourceFactory {
-    let mockClassFactory:  MockClassFactory
+    let mockClassFactory: MockClassFactory
 
     public init(
-        mockClassFactory:  MockClassFactory = MockClassFactory()
+        mockClassFactory: MockClassFactory = MockClassFactory()
     ) {
         self.mockClassFactory = mockClassFactory
     }

@@ -41,16 +41,20 @@ public struct FunctionClassMemberImplFactory {
                         }
 
                         try FunctionDeclSyntax("func matches(_ invocation: Invocation_\(protocolFunctionDeclaration.name)) -> Bool") {
-                            let predicateMatches = parameters.filter {
+                            let nonFunctionalParams = parameters.filter {
                                 !$0.type.isFunctionTypeSyntax
                             }
-                            .map { param in
-                                let name = (param.secondName ?? param.firstName).trimmed
-                                return "\(name).predicate(invocation.\(name))"
-                            }
-                            .joined(separator: " && ")
+                            if nonFunctionalParams.isEmpty {
+                                StmtSyntax("return true")
+                            } else {
+                                let predicateMatches = nonFunctionalParams.map { param in
+                                    let name = (param.secondName ?? param.firstName).trimmed
+                                    return "\(name).predicate(invocation.\(name))"
+                                }
+                                .joined(separator: " && ")
 
-                            StmtSyntax("return \(raw: predicateMatches)")
+                                StmtSyntax("return \(raw: predicateMatches)")
+                            }
                         }
                     }
                 )
