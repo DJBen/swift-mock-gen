@@ -2,7 +2,7 @@
 import XCTest
 @testable import CodeGenerationFactories
 import SwiftSyntax
-import TestSupport
+import CodeGenTesting
 
 final class FunctionVerifyImplFactoryTests: XCTestCase {
     func testDeclaration() throws {

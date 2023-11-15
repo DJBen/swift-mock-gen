@@ -27,9 +27,9 @@ public struct FunctionClassMemberImplFactory {
                             if let funcTypeSyntax = funcParamSyntax.type.underlyingFunctionTypeSyntax {
                                 let count = funcTypeSyntax.parameters.count
                                 if count == 0 {
-                                    try VariableDeclSyntax("let \(raw: name): InvokeBlock?")
+                                    try VariableDeclSyntax("let \(raw: name): ()?")
                                 } else {
-                                    try VariableDeclSyntax("let \(raw: name): InvokeBlock\(raw: count)<\(funcTypeSyntax.parameters.trimmed)>?")
+                                    try VariableDeclSyntax("let \(raw: name): (\(funcTypeSyntax.parameters.trimmed))?")
                                 }
                             } else {
                                 try VariableDeclSyntax("let \(raw: name): Matching<\(funcParamSyntax.type)>")

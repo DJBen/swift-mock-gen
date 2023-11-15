@@ -2,7 +2,7 @@
 import XCTest
 @testable import CodeGenerationFactories
 import SwiftSyntax
-import TestSupport
+import CodeGenTesting
 
 final class FunctionStubImplFactoryTests: XCTestCase {
     func testDeclaration() throws {
@@ -16,7 +16,7 @@ final class FunctionStubImplFactoryTests: XCTestCase {
             #"""
 
             
-            public func stub_performRequest(request: Matching<URLRequest>, reportId: Matching<String>, includeLogs: Matching<Bool>, onSuccess: InvokeBlock?, onPermanentFailure: InvokeBlock2<Error, String>?, andReturn value: String) {
+            public func stub_performRequest(request: Matching<URLRequest>, reportId: Matching<String>, includeLogs: Matching<Bool>, onSuccess: ()?, onPermanentFailure: (Error, String)?, andReturn value: String) {
                 expect_performRequest(
                     request: request,
                     reportId: reportId,

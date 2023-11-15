@@ -1,7 +1,7 @@
 import XCTest
 @testable import CodeGenerationFactories
 import SwiftSyntax
-import TestSupport
+import CodeGenTesting
 
 final class FunctionMockImplFactoryTests: XCTestCase {
     func test_performRequest() throws {
@@ -36,7 +36,7 @@ final class FunctionMockImplFactoryTests: XCTestCase {
                             onSuccess()
                         }
                         if let invoke_onPermanentFailure = stub.onPermanentFailure {
-                            onPermanentFailure(invoke_onPermanentFailure.param1, invoke_onPermanentFailure.param2)
+                            onPermanentFailure(invoke_onPermanentFailure.0, invoke_onPermanentFailure.1)
                         }
                         return stub.returnValue
                     }

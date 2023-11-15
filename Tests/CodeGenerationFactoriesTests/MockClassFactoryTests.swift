@@ -1,7 +1,7 @@
 import XCTest
 @testable import CodeGenerationFactories
 import SwiftSyntax
-import TestSupport
+import CodeGenTesting
 
 final class MockClassFactoryTests: XCTestCase {
     func testCase1() throws {
@@ -17,8 +17,8 @@ final class MockClassFactoryTests: XCTestCase {
                     let request: Matching<URLRequest>
                     let reportId: Matching<String>
                     let includeLogs: Matching<Bool>
-                    let onSuccess: InvokeBlock?
-                    let onPermanentFailure: InvokeBlock2<Error, String>?
+                    let onSuccess: ()?
+                    let onPermanentFailure: (Error, String)?
                     let returnValue: String
                     func matches(_ invocation: Invocation_performRequest) -> Bool {
                         return request.predicate(invocation.request) && reportId.predicate(invocation.reportId) && includeLogs.predicate(invocation.includeLogs)
@@ -33,7 +33,7 @@ final class MockClassFactoryTests: XCTestCase {
                 }
                 private (set) var expectations_performRequest: [(Stub_performRequest, Expectation?)] = []
                 private (set) var invocations_performRequest = [Invocation_performRequest] ()
-                
+
                 @objc public func performRequest(
                         request: URLRequest,
                         reportId: String,
@@ -55,7 +55,7 @@ final class MockClassFactoryTests: XCTestCase {
                                 onSuccess()
                             }
                             if let invoke_onPermanentFailure = stub.onPermanentFailure {
-                                onPermanentFailure(invoke_onPermanentFailure.param1, invoke_onPermanentFailure.param2)
+                                onPermanentFailure(invoke_onPermanentFailure.0, invoke_onPermanentFailure.1)
                             }
                             return stub.returnValue
                         }
@@ -63,7 +63,7 @@ final class MockClassFactoryTests: XCTestCase {
                     fatalError("Unexpected invocation of performRequest(request: \(request), reportId: \(reportId), includeLogs: \(includeLogs), onSuccess: …, onPermanentFailure: …). Could not continue without a return value. Did you stub it?")
                 }
 
-                public func stub_performRequest(request: Matching<URLRequest>, reportId: Matching<String>, includeLogs: Matching<Bool>, onSuccess: InvokeBlock?, onPermanentFailure: InvokeBlock2<Error, String>?, andReturn value: String) {
+                public func stub_performRequest(request: Matching<URLRequest>, reportId: Matching<String>, includeLogs: Matching<Bool>, onSuccess: ()?, onPermanentFailure: (Error, String)?, andReturn value: String) {
                     expect_performRequest(
                         request: request,
                         reportId: reportId,
@@ -75,7 +75,7 @@ final class MockClassFactoryTests: XCTestCase {
                     )
                 }
 
-                public func expect_performRequest(request: Matching<URLRequest>, reportId: Matching<String>, includeLogs: Matching<Bool>, onSuccess: InvokeBlock?, onPermanentFailure: InvokeBlock2<Error, String>?, andReturn value: String, expectation: Expectation?) {
+                public func expect_performRequest(request: Matching<URLRequest>, reportId: Matching<String>, includeLogs: Matching<Bool>, onSuccess: ()?, onPermanentFailure: (Error, String)?, andReturn value: String, expectation: Expectation?) {
                     let stub = Stub_performRequest(
                         request: request,
                         reportId: reportId,

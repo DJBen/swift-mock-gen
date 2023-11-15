@@ -58,7 +58,7 @@ public struct FunctionMockImplFactory {
                         } else {
                             try IfExprSyntax("if let invoke_\(raw: name) = stub.\(raw: name)") {
                                 let params = (0..<funcParam.parameters.count).map {
-                                    "invoke_\(name).param\($0 + 1)"
+                                    "invoke_\(name).\($0)"
                                 }.joined(separator: ", ")
                                 ExprSyntax("\(raw: name)(\(raw: params))")
                             }

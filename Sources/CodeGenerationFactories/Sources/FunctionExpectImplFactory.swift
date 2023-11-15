@@ -8,7 +8,7 @@ import SwiftSyntaxBuilder
 /// expect_functionName(
 ///    #non-block arg#: Matching<ArgType>,
 ///    ...
-///    #block arg#: InvokeBlock#NumArg#<BlockArg1, ...>?,
+///    #block arg#: (BlockArg1, ...)?,
 ///    andReturn value: #return type of func#, // only if return type is non-Void
 ///    expectation: Expectation?
 /// )
@@ -28,9 +28,9 @@ public struct FunctionExpectImplFactory {
             if let funcTypeSyntax = funcParamSyntax.type.underlyingFunctionTypeSyntax {
                 let count = funcTypeSyntax.parameters.count
                 if count == 0 {
-                    return "\(name): InvokeBlock?"
+                    return "\(name): ()?"
                 } else {
-                    return "\(name): InvokeBlock\(count)<\(funcTypeSyntax.parameters.trimmed)>?"
+                    return "\(name): (\(funcTypeSyntax.parameters.trimmed))?"
                 }
             } else {
                 return "\(name): Matching<\(type)>"

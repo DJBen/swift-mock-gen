@@ -22,7 +22,11 @@ let package = Package(
     ),
 
     .target(
-      name: "TestSupport",
+      name: "MockTestSupport"
+    ),
+
+    .target(
+      name: "CodeGenTesting",
       dependencies: [
         .product(name: "SwiftSyntaxMacrosTestSupport", package: "swift-syntax"),
       ]
@@ -40,7 +44,7 @@ let package = Package(
         name: "CodeGenerationFactoriesTests",
         dependencies: [
             "CodeGenerationFactories",
-            "TestSupport",
+            "CodeGenTesting",
         ]
     ),
 

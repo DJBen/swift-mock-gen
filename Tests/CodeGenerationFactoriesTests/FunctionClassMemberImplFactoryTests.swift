@@ -2,7 +2,7 @@
 import XCTest
 @testable import CodeGenerationFactories
 import SwiftSyntax
-import TestSupport
+import CodeGenTesting
 
 final class FunctionClassMemberImplFactoryTests: XCTestCase {
     func testDeclarations() throws {
@@ -22,8 +22,8 @@ final class FunctionClassMemberImplFactoryTests: XCTestCase {
                 let request: Matching<URLRequest>
                 let reportId: Matching<String>
                 let includeLogs: Matching<Bool>
-                let onSuccess: InvokeBlock?
-                let onPermanentFailure: InvokeBlock2<Error, String>?
+                let onSuccess: ()?
+                let onPermanentFailure: (Error, String)?
                 let returnValue: String
                 func matches(_ invocation: Invocation_performRequest) -> Bool {
                     return request.predicate(invocation.request) && reportId.predicate(invocation.reportId) && includeLogs.predicate(invocation.includeLogs)
