@@ -1,14 +1,14 @@
-# SwiftParserCLI
+# SwiftMockGen
 
-This directory contains the source files of the `swift-parser-cli` program.
+This directory contains the source files of the `swift-mock-gen` program.
 
-You can build `swift-parser-cli` by checking out `swift-syntax` and running 
+You can build `swift-mock-gen` by checking out `swift-syntax` and running 
 ```
-swift build --package-path SwiftParserCLI
+swift build --package-path SwiftMockGen
 ```
 or entering this directory and running
 ```
 swift build
 ```
 
-You can also open the `SwiftParserCLI` package and building the `swift-parser-cli` target in Xcode.
+You can also open the `SwiftMockGen` package and building the `swift-mock-gen` target in Xcode.

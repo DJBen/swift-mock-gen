@@ -24,11 +24,11 @@ import WinSDK
 #endif
 
 @main
-class SwiftParserCli: ParsableCommand {
+class SwiftMockGen: ParsableCommand {
   required init() {}
 
   static var configuration = CommandConfiguration(
-    abstract: "Utility to test SwiftSyntax syntax tree creation.",
+    abstract: "Utility to generate Swift mock implementations given a protocol.",
     subcommands: [
       BasicFormat.self,
       PerformanceTest.self,
@@ -36,6 +36,7 @@ class SwiftParserCli: ParsableCommand {
       PrintTree.self,
       Reduce.self,
       VerifyRoundTrip.self,
+      GenerateMock.self,
     ]
   )
 }

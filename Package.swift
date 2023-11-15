@@ -4,12 +4,13 @@ import Foundation
 import PackageDescription
 
 let package = Package(
-  name: "SwiftParserCLI",
+  name: "SwiftMockGen",
   platforms: [
-    .macOS(.v10_15)
+    .macOS(.v12),
   ],
   products: [
-    .executable(name: "swift-parser-cli", targets: ["swift-parser-cli"])
+    .executable(name: "swift-mock-gen", targets: ["swift-mock-gen"]),
+    .library(name: "CodeGenerationFactories", targets: ["CodeGenerationFactories"]),
   ],
   dependencies: [
     .package(url: "https://github.com/apple/swift-argument-parser.git", from: "1.2.2"),
@@ -20,10 +21,34 @@ let package = Package(
       name: "InstructionCounter"
     ),
 
+    .target(
+      name: "TestSupport",
+      dependencies: [
+        .product(name: "SwiftSyntaxMacrosTestSupport", package: "swift-syntax"),
+      ]
+    ),
+
+    .target(
+        name: "CodeGenerationFactories",
+        dependencies: [
+            .product(name: "SwiftSyntax", package: "swift-syntax"),
+            .product(name: "SwiftSyntaxBuilder", package: "swift-syntax"),
+        ]
+    ),
+
+    .testTarget(
+        name: "CodeGenerationFactoriesTests",
+        dependencies: [
+            "CodeGenerationFactories",
+            "TestSupport",
+        ]
+    ),
+
     .executableTarget(
-      name: "swift-parser-cli",
+      name: "swift-mock-gen",
       dependencies: [
         "InstructionCounter",
+        "CodeGenerationFactories",
         .product(name: "SwiftBasicFormat", package: "swift-syntax"),
         .product(name: "SwiftDiagnostics", package: "swift-syntax"),
         .product(name: "SwiftOperators", package: "swift-syntax"),
