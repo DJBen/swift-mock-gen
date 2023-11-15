@@ -47,7 +47,7 @@ final class FunctionMockImplFactoryTests: XCTestCase {
         )
     }
 
-    func test_asyncThrows() throws {
+    func test_emptyParams() throws {
         let result = try FunctionMockImplFactory().declaration(
             protocolDecl: TestCases.Case2.protocolDecl,
             protocolFunctionDeclaration: try! FunctionDeclSyntax(
