@@ -24,8 +24,8 @@ public struct FunctionStubImplFactory {
 
         var functionSigParams = parameters.map { (funcParamSyntax: FunctionParameterSyntax) in
             let name = (funcParamSyntax.secondName ?? funcParamSyntax.firstName).text
-            let type = funcParamSyntax.type
-            if let funcTypeSyntax = funcParamSyntax.type.underlyingFunctionTypeSyntax {
+            let type = funcParamSyntax.type.trimmed
+            if let funcTypeSyntax = type.underlyingFunctionTypeSyntax {
                 let count = funcTypeSyntax.parameters.count
                 if count == 0 {
                     return "\(name): ()?"
@@ -36,8 +36,12 @@ public struct FunctionStubImplFactory {
                 return "\(name): Matching<\(type)>"
             }
         }
-        if let _ = protocolFunctionDeclaration.signature.returnClause {
-            functionSigParams.append("andReturn value: String")
+        if let returnClause = protocolFunctionDeclaration.signature.returnClause {
+            if returnClause.type.isFunctionTypeSyntax {
+                functionSigParams.append("andReturn value: @escaping \(returnClause.type.trimmed)")
+            } else {
+                functionSigParams.append("andReturn value: \(returnClause.type.trimmed)")
+            }
         }
 
         return FunctionDeclSyntax(
@@ -66,7 +70,9 @@ public struct FunctionStubImplFactory {
                     let name = (funcParamSyntax.secondName ?? funcParamSyntax.firstName).text
                     return "\(name): \(name)"
                 }
-                let _ = params.append("andReturn: value")
+                if let _ = protocolFunctionDeclaration.signature.returnClause {
+                    let _ = params.append("andReturn: value")
+                }
                 let _ = params.append("expectation: nil")
                 let paramString = params.joined(separator: ",\n")
                 ExprSyntax(

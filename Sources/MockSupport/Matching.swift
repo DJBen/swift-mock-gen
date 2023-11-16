@@ -3,8 +3,8 @@ import Foundation
 // Consider replace this with #Predicate for iOS 17+ only.
 
 public struct Matching<Param> {
-    let predicate: (Param?) -> Bool
-    let description: String
+    public let predicate: (Param?) -> Bool
+    public let description: String
 
     public init(_ predicate: @escaping (Param?) -> Bool, description: String? = nil) {
         self.predicate = predicate

@@ -48,6 +48,14 @@ let package = Package(
         ]
     ),
 
+    .testTarget(
+        name: "ExampleMockTests",
+        dependencies: [
+            "MockSupport",
+        ],
+        path: "ExampleTests"
+    ),
+
     .executableTarget(
       name: "swift-mock-gen",
       dependencies: [

@@ -125,6 +125,76 @@ final class MockClassFactoryTests: XCTestCase {
             public class ServiceMock: ServiceProtocol  {
                 public init() {
                 }
+
+                var name: String {
+                    get {
+                        getCount_name += 1
+                        return underlying_name
+                    }
+                    set {
+                        setCount_name += 1
+                        underlying_name = newValue
+                    }
+                }
+                var underlying_name: String!
+                private (set) var getCount_name: Int = 0
+                private (set) var setCount_name: Int = 0
+
+                var anyProtocol: any Codable {
+                    get {
+                        getCount_anyProtocol += 1
+                        return underlying_anyProtocol
+                    }
+                    set {
+                        setCount_anyProtocol += 1
+                        underlying_anyProtocol = newValue
+                    }
+                }
+                var underlying_anyProtocol: any Codable!
+                private (set) var getCount_anyProtocol: Int = 0
+                private (set) var setCount_anyProtocol: Int = 0
+
+                var secondName: String? {
+                    get {
+                        getCount_secondName += 1
+                        return underlying_secondName
+                    }
+                    set {
+                        setCount_secondName += 1
+                        underlying_secondName = newValue
+                    }
+                }
+                var underlying_secondName: String!
+                private (set) var getCount_secondName: Int = 0
+                private (set) var setCount_secondName: Int = 0
+
+                var added: () -> Void {
+                    get {
+                        getCount_added += 1
+                        return underlying_added
+                    }
+                    set {
+                        setCount_added += 1
+                        underlying_added = newValue
+                    }
+                }
+                var underlying_added: () -> Void!
+                private (set) var getCount_added: Int = 0
+                private (set) var setCount_added: Int = 0
+
+                var removed: (() -> Void)? {
+                    get {
+                        getCount_removed += 1
+                        return underlying_removed
+                    }
+                    set {
+                        setCount_removed += 1
+                        underlying_removed = newValue
+                    }
+                }
+                var underlying_removed: (() -> Void)!
+                private (set) var getCount_removed: Int = 0
+                private (set) var setCount_removed: Int = 0
                 public struct Stub_initialize {
                     let name: Matching<String>
                     let secondName: Matching<String?>
@@ -155,7 +225,6 @@ final class MockClassFactoryTests: XCTestCase {
                     expect_initialize(
                         name: name,
                         secondName: secondName,
-                        andReturn: value,
                         expectation: nil
                     )
                 }
@@ -163,8 +232,7 @@ final class MockClassFactoryTests: XCTestCase {
                 public func expect_initialize(name: Matching<String>, secondName: Matching<String?>, expectation: Expectation?) {
                     let stub = Stub_initialize(
                         name: name,
-                        secondName: secondName,
-                        returnValue: value
+                        secondName: secondName
                     )
                     expectations_initialize.append((stub, expectation))
                 }
@@ -213,14 +281,14 @@ final class MockClassFactoryTests: XCTestCase {
                     fatalError("Unexpected invocation of fetchConfig(). Could not continue without a return value. Did you stub it?")
                 }
             
-                public func stub_fetchConfig(andReturn value: String) {
+                public func stub_fetchConfig(andReturn value: [String: String]) {
                     expect_fetchConfig(
                         andReturn: value,
                         expectation: nil
                     )
                 }
             
-                public func expect_fetchConfig(andReturn value: String, expectation: Expectation?) {
+                public func expect_fetchConfig(andReturn value: [String: String], expectation: Expectation?) {
                     let stub = Stub_fetchConfig(
                         returnValue: value
                     )
@@ -275,7 +343,7 @@ final class MockClassFactoryTests: XCTestCase {
                     fatalError("Unexpected invocation of fetchData(name: \(name)). Could not continue without a return value. Did you stub it?")
                 }
             
-                public func stub_fetchData(name: Matching<(String, count: Int)>, andReturn value: String) {
+                public func stub_fetchData(name: Matching<(String, count: Int)>, andReturn value: (() -> Void)) {
                     expect_fetchData(
                         name: name,
                         andReturn: value,
@@ -283,7 +351,7 @@ final class MockClassFactoryTests: XCTestCase {
                     )
                 }
             
-                public func expect_fetchData(name: Matching<(String, count: Int)>, andReturn value: String, expectation: Expectation?) {
+                public func expect_fetchData(name: Matching<(String, count: Int)>, andReturn value: (() -> Void), expectation: Expectation?) {
                     let stub = Stub_fetchData(
                         name: name,
                         returnValue: value

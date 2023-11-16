@@ -15,7 +15,7 @@ public struct Expectation {
             self = .exact(value)
         }
 
-        func matches(_ callCount: Int) -> Bool {
+        public func matches(_ callCount: Int) -> Bool {
             switch self {
             case .any:
                 return true
@@ -34,7 +34,7 @@ public struct Expectation {
             }
         }
 
-        func verify(methodSignature: String, callCount: Int) {
+        public func verify(methodSignature: String, callCount: Int) {
             if !matches(callCount) {
                 let message = violationDescription(
                     methodSignature: methodSignature,
@@ -64,7 +64,7 @@ public struct Expectation {
         }
     }
 
-    let callCountPredicate: CallCountPredicate
+    public let callCountPredicate: CallCountPredicate
 
     public static func count(_ predicate: CallCountPredicate) -> Expectation {
         Expectation(callCountPredicate: predicate)

@@ -18,7 +18,9 @@ public struct SourceFactory {
             protocolDecl: protocolDecl
         )
         return SourceFileSyntax {
-            StmtSyntax("import Foundation")
+            "import Foundation"
+            "import MockSupport"
+            "import XCTest"
 
             if surroundWithPoundIfDebug {
                 IfConfigDeclSyntax(

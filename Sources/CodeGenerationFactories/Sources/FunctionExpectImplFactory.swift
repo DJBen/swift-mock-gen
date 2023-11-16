@@ -24,8 +24,8 @@ public struct FunctionExpectImplFactory {
 
         var functionSigParams = parameters.map { (funcParamSyntax: FunctionParameterSyntax) in
             let name = (funcParamSyntax.secondName ?? funcParamSyntax.firstName).text
-            let type = funcParamSyntax.type
-            if let funcTypeSyntax = funcParamSyntax.type.underlyingFunctionTypeSyntax {
+            let type = funcParamSyntax.type.trimmed
+            if let funcTypeSyntax = type.underlyingFunctionTypeSyntax {
                 let count = funcTypeSyntax.parameters.count
                 if count == 0 {
                     return "\(name): ()?"
@@ -36,8 +36,12 @@ public struct FunctionExpectImplFactory {
                 return "\(name): Matching<\(type)>"
             }
         }
-        if let _ = protocolFunctionDeclaration.signature.returnClause {
-            functionSigParams.append("andReturn value: String")
+        if let returnClause = protocolFunctionDeclaration.signature.returnClause {
+            if returnClause.type.isFunctionTypeSyntax {
+                functionSigParams.append("andReturn value: @escaping \(returnClause.type.trimmed)")
+            } else {
+                functionSigParams.append("andReturn value: \(returnClause.type.trimmed)")
+            }
         }
         functionSigParams.append("expectation: Expectation?")
 
@@ -67,7 +71,9 @@ public struct FunctionExpectImplFactory {
                     let name = (funcParamSyntax.secondName ?? funcParamSyntax.firstName).text
                     return "\(name): \(name)"
                 }
-                let _ = params.append("returnValue: value")
+                if let _ = protocolFunctionDeclaration.signature.returnClause {
+                    let _ = params.append("returnValue: value")
+                }
                 let paramString = params.joined(separator: ",\n")
                 DeclSyntax(
                 #"""

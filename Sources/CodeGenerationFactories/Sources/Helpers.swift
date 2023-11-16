@@ -49,3 +49,46 @@ extension DeclModifierListSyntax {
         }
     }
 }
+
+extension AccessorBlockSyntax {
+    var protocolVarIsGetSet: Bool {
+        switch accessors {
+        case .accessors(let accessorDecl):
+            return accessorDecl.contains(where: { $0.accessorSpecifier.kind == TokenSyntax.keyword(.get).kind }) &&
+            accessorDecl.contains(where: { $0.accessorSpecifier.kind == TokenSyntax.keyword(.set).kind })
+        case .getter(_):
+            // A protocol cannot have a getter impl syntax.
+            return false
+        }
+    }
+}
+
+extension TypeSyntax {
+    /// Whether it is a function type syntax or attributed syntax that has an underlying function type syntax.
+    /// e.g. `@escaping () -> Void` or `(Int, String) -> Void`
+    var isFunctionTypeSyntax: Bool {
+        if self.is(FunctionTypeSyntax.self) {
+            return true
+        }
+        if let attr = self.as(AttributedTypeSyntax.self) {
+            return attr.baseType.is(FunctionTypeSyntax.self)
+        }
+        if let tuple = self.as(TupleTypeSyntax.self) {
+            if tuple.elements.count == 1, let firstElement = tuple.elements.first {
+                return firstElement.type.isFunctionTypeSyntax
+            }
+            return false
+        }
+        return false
+    }
+
+    var underlyingFunctionTypeSyntax: FunctionTypeSyntax? {
+        if let funcTypeSyntax = self.as(FunctionTypeSyntax.self) {
+            return funcTypeSyntax
+        }
+        if let attr = self.as(AttributedTypeSyntax.self), let funcTypeSyntax = attr.baseType.as(FunctionTypeSyntax.self) {
+            return funcTypeSyntax
+        }
+        return nil
+    }
+}

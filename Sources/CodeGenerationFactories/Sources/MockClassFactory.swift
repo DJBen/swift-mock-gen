@@ -7,19 +7,22 @@ public struct MockClassFactory {
     private let funcMockImplFactory: FunctionMockImplFactory
     private let funcStubImplFactory: FunctionStubImplFactory
     private let funcVerifyImplFactory: FunctionVerifyImplFactory
+    private let variableImplFactory: VariableImplFactory
 
     public init(
         funcClassMemberImplFactory: FunctionClassMemberImplFactory = FunctionClassMemberImplFactory(),
         funcExpectImplFactory: FunctionExpectImplFactory = FunctionExpectImplFactory(),
         funcMockImplFactory: FunctionMockImplFactory = FunctionMockImplFactory(),
         funcStubImplFactory: FunctionStubImplFactory = FunctionStubImplFactory(),
-        funcVerifyImplFactory: FunctionVerifyImplFactory = FunctionVerifyImplFactory()
+        funcVerifyImplFactory: FunctionVerifyImplFactory = FunctionVerifyImplFactory(),
+        variableImplFactory: VariableImplFactory = VariableImplFactory()
     ) {
         self.funcClassMemberImplFactory = funcClassMemberImplFactory
         self.funcExpectImplFactory = funcExpectImplFactory
         self.funcMockImplFactory = funcMockImplFactory
         self.funcStubImplFactory = funcStubImplFactory
         self.funcVerifyImplFactory = funcVerifyImplFactory
+        self.variableImplFactory = variableImplFactory
     }
 
     public func classDecl(
@@ -74,9 +77,16 @@ public struct MockClassFactory {
                     signature: FunctionSignatureSyntax(parameterClause: FunctionParameterClauseSyntax(parameters: FunctionParameterListSyntax(itemsBuilder: {})))
                 ) {}
             }
-            
+
             for member in protocolDecl.memberBlock.members {
-                if let protocolFunctionDeclaration = member.decl.as(FunctionDeclSyntax.self) {
+                if let protocolFunctionDecl = member.decl.as(VariableDeclSyntax.self) {
+                    for decl in try variableImplFactory.decls(
+                        protocolDecl: protocolDecl,
+                        protocolVariableDecl: protocolFunctionDecl
+                    ) {
+                        MemberBlockItemSyntax(decl: decl)
+                    }
+                } else if let protocolFunctionDeclaration = member.decl.as(FunctionDeclSyntax.self) {
                     for decl in try funcClassMemberImplFactory.declarations(
                         protocolDecl: protocolDecl,
                         protocolFunctionDeclaration: protocolFunctionDeclaration

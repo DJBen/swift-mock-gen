@@ -62,5 +62,25 @@ enum TestCases {
             func fetchData(_ name: (String, count: Int)) async -> (() -> Void)
         }
         """#)
+
+        static let varDecl1 = try! VariableDeclSyntax(#"""
+        var name: String {
+            get
+        }
+        """#)
+
+        static let varDecl2 = try! VariableDeclSyntax(#"""
+        var removed: (() -> Void)? {
+            get
+            set
+        }
+        """#)
+
+        static let varDecl3 = try! VariableDeclSyntax(#"""
+        var anyProtocol: any Codable {
+            get
+            set
+        }
+        """#)
     }
 }
