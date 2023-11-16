@@ -29,14 +29,14 @@ final class FunctionClassMemberImplFactoryTests: XCTestCase {
                     return request.predicate(invocation.request) && reportId.predicate(invocation.reportId) && includeLogs.predicate(invocation.includeLogs)
                 }
             }
-            public struct Invocation_performRequest {
-                let request: URLRequest
-                let reportId: String
-                let includeLogs: Bool
-                let onSuccess: Void
-                let onPermanentFailure: Void
-            }
             private (set) var expectations_performRequest: [(Stub_performRequest, Expectation?)] = []
+            public struct Invocation_performRequest {
+                public let request: URLRequest
+                public let reportId: String
+                public let includeLogs: Bool
+                public let onSuccess: Void
+                public let onPermanentFailure: Void
+            }
             private (set) var invocations_performRequest = [Invocation_performRequest] ()
             """#
         )
@@ -65,9 +65,9 @@ final class FunctionClassMemberImplFactoryTests: XCTestCase {
                     return true
                 }
             }
+            private (set) var expectations_fetchConfig: [(Stub_fetchConfig, Expectation?)] = []
             public struct Invocation_fetchConfig {
             }
-            private (set) var expectations_fetchConfig: [(Stub_fetchConfig, Expectation?)] = []
             private (set) var invocations_fetchConfig = [Invocation_fetchConfig] ()
             """#
         )

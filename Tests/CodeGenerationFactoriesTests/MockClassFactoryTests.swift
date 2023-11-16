@@ -24,14 +24,14 @@ final class MockClassFactoryTests: XCTestCase {
                         return request.predicate(invocation.request) && reportId.predicate(invocation.reportId) && includeLogs.predicate(invocation.includeLogs)
                     }
                 }
-                public struct Invocation_performRequest {
-                    let request: URLRequest
-                    let reportId: String
-                    let includeLogs: Bool
-                    let onSuccess: Void
-                    let onPermanentFailure: Void
-                }
                 private (set) var expectations_performRequest: [(Stub_performRequest, Expectation?)] = []
+                public struct Invocation_performRequest {
+                    public let request: URLRequest
+                    public let reportId: String
+                    public let includeLogs: Bool
+                    public let onSuccess: Void
+                    public let onPermanentFailure: Void
+                }
                 private (set) var invocations_performRequest = [Invocation_performRequest] ()
 
                 @objc public func performRequest(
@@ -126,7 +126,7 @@ final class MockClassFactoryTests: XCTestCase {
                 public init() {
                 }
 
-                var name: String {
+                public var name: String {
                     get {
                         getCount_name += 1
                         return underlying_name
@@ -140,7 +140,7 @@ final class MockClassFactoryTests: XCTestCase {
                 private (set) var getCount_name: Int = 0
                 private (set) var setCount_name: Int = 0
 
-                var anyProtocol: any Codable {
+                public var anyProtocol: any Codable {
                     get {
                         getCount_anyProtocol += 1
                         return underlying_anyProtocol
@@ -150,11 +150,11 @@ final class MockClassFactoryTests: XCTestCase {
                         underlying_anyProtocol = newValue
                     }
                 }
-                var underlying_anyProtocol: any Codable!
+                var underlying_anyProtocol: (any Codable)!
                 private (set) var getCount_anyProtocol: Int = 0
                 private (set) var setCount_anyProtocol: Int = 0
 
-                var secondName: String? {
+                public var secondName: String? {
                     get {
                         getCount_secondName += 1
                         return underlying_secondName
@@ -168,7 +168,7 @@ final class MockClassFactoryTests: XCTestCase {
                 private (set) var getCount_secondName: Int = 0
                 private (set) var setCount_secondName: Int = 0
 
-                var added: () -> Void {
+                public var added: () -> Void {
                     get {
                         getCount_added += 1
                         return underlying_added
@@ -178,11 +178,11 @@ final class MockClassFactoryTests: XCTestCase {
                         underlying_added = newValue
                     }
                 }
-                var underlying_added: () -> Void!
+                var underlying_added: (() -> Void)!
                 private (set) var getCount_added: Int = 0
                 private (set) var setCount_added: Int = 0
 
-                var removed: (() -> Void)? {
+                public var removed: (() -> Void)? {
                     get {
                         getCount_removed += 1
                         return underlying_removed
@@ -202,11 +202,11 @@ final class MockClassFactoryTests: XCTestCase {
                         return name.predicate(invocation.name) && secondName.predicate(invocation.secondName)
                     }
                 }
-                public struct Invocation_initialize {
-                    let name: String
-                    let secondName: String?
-                }
                 private (set) var expectations_initialize: [(Stub_initialize, Expectation?)] = []
+                public struct Invocation_initialize {
+                    public let name: String
+                    public let secondName: String?
+                }
                 private (set) var invocations_initialize = [Invocation_initialize] ()
 
                 public func initialize(name: String, secondName: String?) {
@@ -265,9 +265,9 @@ final class MockClassFactoryTests: XCTestCase {
                         return true
                     }
                 }
+                private (set) var expectations_fetchConfig: [(Stub_fetchConfig, Expectation?)] = []
                 public struct Invocation_fetchConfig {
                 }
-                private (set) var expectations_fetchConfig: [(Stub_fetchConfig, Expectation?)] = []
                 private (set) var invocations_fetchConfig = [Invocation_fetchConfig] ()
             
                 public func fetchConfig() async throws -> [String: String] {
@@ -324,10 +324,10 @@ final class MockClassFactoryTests: XCTestCase {
                         return name.predicate(invocation.name)
                     }
                 }
-                public struct Invocation_fetchData {
-                    let name: (String, count: Int)
-                }
                 private (set) var expectations_fetchData: [(Stub_fetchData, Expectation?)] = []
+                public struct Invocation_fetchData {
+                    public let name: (String, count: Int)
+                }
                 private (set) var invocations_fetchData = [Invocation_fetchData] ()
             
                 public func fetchData(_ name: (String, count: Int)) async -> (() -> Void) {
@@ -343,7 +343,7 @@ final class MockClassFactoryTests: XCTestCase {
                     fatalError("Unexpected invocation of fetchData(name: \(name)). Could not continue without a return value. Did you stub it?")
                 }
             
-                public func stub_fetchData(name: Matching<(String, count: Int)>, andReturn value: (() -> Void)) {
+                public func stub_fetchData(name: Matching<(String, count: Int)>, andReturn value: @escaping (() -> Void)) {
                     expect_fetchData(
                         name: name,
                         andReturn: value,
@@ -351,7 +351,7 @@ final class MockClassFactoryTests: XCTestCase {
                     )
                 }
             
-                public func expect_fetchData(name: Matching<(String, count: Int)>, andReturn value: (() -> Void), expectation: Expectation?) {
+                public func expect_fetchData(name: Matching<(String, count: Int)>, andReturn value: @escaping (() -> Void), expectation: Expectation?) {
                     let stub = Stub_fetchData(
                         name: name,
                         returnValue: value

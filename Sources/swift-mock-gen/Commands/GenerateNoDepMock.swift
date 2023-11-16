@@ -3,10 +3,10 @@ import CodeGenerationFactories
 import SwiftParser
 import SwiftSyntax
 
-struct GenerateMock: ParsableCommand, ParseCommand {
+struct GenerateNoDepMock: ParsableCommand, ParseCommand {
     static var configuration = CommandConfiguration(
-        commandName: "gen-alt",
-        abstract: "Generate mock for given protocols in the provided source files."
+        commandName: "gen",
+        abstract: "Generate mock for given protocols in the provided source files. The generated mock needs no dependencies."
     )
 
     @OptionGroup
@@ -20,7 +20,7 @@ struct GenerateMock: ParsableCommand, ParseCommand {
             let tree = Parser.parse(source: sourceBuffer)
             try tree.statements.forEach { codeBlockItemSyntax in
                 if let protocolDecl = codeBlockItemSyntax.item.as(ProtocolDeclSyntax.self) {
-                    let mockClass = try SourceFactory().classDecl(
+                    let mockClass = try NoDepSourceFactory().classDecl(
                         protocolDecl: protocolDecl,
                         surroundWithPoundIfDebug: surroundWithPoundIfDebug
                     )

@@ -2,7 +2,13 @@ import SwiftSyntax
 import SwiftSyntaxBuilder
 
 public struct FunctionClassMemberImplFactory {
-    public init() {}
+    private let functionInvocationImplFactory: FunctionInvocationImplFactory
+
+    public init(
+        functionInvocationImplFactory: FunctionInvocationImplFactory = FunctionInvocationImplFactory()
+    ) {
+        self.functionInvocationImplFactory = functionInvocationImplFactory
+    }
 
     func declarations(
         protocolDecl: ProtocolDeclSyntax,
@@ -60,27 +66,11 @@ public struct FunctionClassMemberImplFactory {
                 )
             ),
             DeclSyntax(
-                StructDeclSyntax(
-                    modifiers: modifiers,
-                    name: "Invocation_\(protocolFunctionDeclaration.name)",
-                    memberBlock: try MemberBlockSyntax {
-                        for funcParamSyntax in parameters {
-                            let name = (funcParamSyntax.secondName ?? funcParamSyntax.firstName).text
-                            if funcParamSyntax.type.isFunctionTypeSyntax {
-                                try VariableDeclSyntax("let \(raw: name): Void")
-                            } else {
-                                try VariableDeclSyntax("let \(raw: name): \(funcParamSyntax.type)")
-                            }
-                        }
-                    }
-                )
-            ),
-            DeclSyntax(
                 try VariableDeclSyntax("private (set) var expectations_\(protocolFunctionDeclaration.name): [(Stub_\(protocolFunctionDeclaration.name), Expectation?)] = []")
             ),
-            DeclSyntax(
-                try VariableDeclSyntax("private (set) var invocations_\(protocolFunctionDeclaration.name) = [Invocation_\(protocolFunctionDeclaration.name)] ()")
-            )
-        ]
+        ] + (try functionInvocationImplFactory.decls(
+            protocolDecl: protocolDecl,
+            protocolFunctionDeclaration: protocolFunctionDeclaration
+        ))
     }
 }

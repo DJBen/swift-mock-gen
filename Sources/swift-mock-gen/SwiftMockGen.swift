@@ -37,6 +37,7 @@ class SwiftMockGen: ParsableCommand {
       Reduce.self,
       VerifyRoundTrip.self,
       GenerateMock.self,
+      GenerateNoDepMock.self,
     ]
   )
 }

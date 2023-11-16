@@ -20,7 +20,7 @@ final class VariableImplFactoryTests: XCTestCase {
             ##"""
 
 
-            var name: String {
+            public var name: String {
                 get {
                     getCount_name += 1
                     return underlying_name
@@ -52,7 +52,7 @@ final class VariableImplFactoryTests: XCTestCase {
             ##"""
 
 
-            var removed: (() -> Void)? {
+            public var removed: (() -> Void)? {
                 get {
                     getCount_removed += 1
                     return underlying_removed
