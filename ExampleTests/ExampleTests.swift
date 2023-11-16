@@ -14,6 +14,10 @@ class TestedClass {
     ) async -> (() -> Void) {
         return await executor.fetchData(("", 1))
     }
+
+    func processName() {
+        print("\(executor.name) \(executor.secondName)")
+    }
 }
 
 final class ExampleTests: XCTestCase {
@@ -41,5 +45,16 @@ final class ExampleTests: XCTestCase {
         let _ = await container.fetchData()
 
         mock.verify_fetchData()
+    }
+
+    func testExample2() async throws {
+        let mock = ServiceMock()
+        let container = TestedClass(executor: mock)
+
+        mock.underlying_name = "Name 1"
+        mock.underlying_secondName = "Name 2"
+        container.processName()
+
+        XCTAssertEqual(mock.getCount_secondName, 1)
     }
 }
