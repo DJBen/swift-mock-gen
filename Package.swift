@@ -1,12 +1,13 @@
-// swift-tools-version:5.7
+// swift-tools-version:5.9
 
-import Foundation
 import PackageDescription
+import CompilerPluginSupport
 
 let package = Package(
   name: "SwiftMockGen",
   platforms: [
-    .macOS(.v12),
+    .macOS(.v10_15),
+    .iOS(.v13),
   ],
   products: [
     .executable(name: "swift-mock-gen", targets: ["swift-mock-gen"]),
@@ -17,8 +18,20 @@ let package = Package(
     .package(url: "https://github.com/apple/swift-syntax.git", from: "509.0.2")
   ],
   targets: [
+    .macro(
+        name: "SwiftMockGenMacro",
+        dependencies: [
+            .product(name: "SwiftSyntaxMacros", package: "swift-syntax"),
+            .product(name: "SwiftCompilerPlugin", package: "swift-syntax")
+        ]
+    ),
+
     .target(
       name: "InstructionCounter"
+    ),
+
+    .target(
+      name: "SwiftMockGen"
     ),
 
     .target(

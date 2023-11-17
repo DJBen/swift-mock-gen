@@ -74,19 +74,21 @@ public class ServiceNoDepMock: NSObject, ServiceProtocol  {
     public struct Invocation_initialize {
         public let name: String
         public let secondName: String?
+        public let completion: Void
     }
     private (set) var invocations_initialize = [Invocation_initialize] ()
 
-    public var handler_initialize: ((String, String?) -> Void)?
+    public var handler_initialize: ((String, String?, @escaping (Error?) -> Void) -> Void)?
 
-    public func initialize(name: String, secondName: String?) {
+    public func initialize(name: String, secondName: String?, completion: @escaping (Error?) -> Void) {
         let invocation = Invocation_initialize(
             name: name,
-            secondName: secondName
+            secondName: secondName,
+            completion: ()
         )
         invocations_initialize.append(invocation)
         if let handler = handler_initialize {
-            handler(name, secondName)
+            handler(name, secondName, completion)
         }
     }
     public struct Invocation_fetchConfig {
@@ -121,22 +123,6 @@ public class ServiceNoDepMock: NSObject, ServiceProtocol  {
             return await handler(name)
         }
         fatalError("Please set handler_fetchData")
-    }
-    public struct Invocation_ffffff {
-        public let block: Void
-    }
-    private (set) var invocations_ffffff = [Invocation_ffffff] ()
-
-    public var handler_ffffff: ((@escaping () -> Void) -> Void)?
-
-    public func ffffff(_ block: @escaping () -> Void) {
-        let invocation = Invocation_ffffff(
-            block: ()
-        )
-        invocations_ffffff.append(invocation)
-        if let handler = handler_ffffff {
-            handler(block)
-        }
     }
 }
 #endif

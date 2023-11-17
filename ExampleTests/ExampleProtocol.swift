@@ -17,8 +17,7 @@ public protocol ServiceProtocol {
         get
         set
     }
-
-    func initialize(name: String, secondName: String?)
+    func initialize(name: String, secondName: String?, completion: @escaping (Error?) -> Void)
     func fetchConfig() async throws -> [String: String]
     func fetchData(_ name: (String, count: Int)) async -> (() -> Void)
 }
