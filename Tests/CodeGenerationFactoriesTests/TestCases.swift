@@ -83,4 +83,37 @@ enum TestCases {
         }
         """#)
     }
+
+    enum Case3 {
+        static let protocolDecl = try! ProtocolDeclSyntax(#"""
+        public protocol ErrorReporting {
+            func reportError(_ error: Error)
+            func reportError(_ error: Error, description: String)
+            func reportError(_ error: Error, metadata: [String: Any]?)
+            func reportError(_ error: Error, metadata: [String: Any]?, completion: @escaping () -> Void)
+        }
+        """#)
+        static let funcDecls = [
+            try! FunctionDeclSyntax(
+                #"""
+                func reportError(_ error: Error)
+                """#
+            ),
+            try! FunctionDeclSyntax(
+                #"""
+                func reportError(_ error: Error, description: String)
+                """#
+            ),
+            try! FunctionDeclSyntax(
+                #"""
+                func reportError(_ error: Error, metadata: [String: Any]?)
+                """#
+            ),
+            try! FunctionDeclSyntax(
+                #"""
+                func reportError(_ error: Error, metadata: [String: Any]?, completion: @escaping () -> Void)
+                """#
+            )
+        ]
+    }
 }

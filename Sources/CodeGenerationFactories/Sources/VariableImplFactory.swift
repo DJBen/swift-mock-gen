@@ -136,7 +136,7 @@ extension DeclModifierListSyntax {
     /// - Returns: A modifier list after modifier specific to 'set' is removed.
     func removingSetterModifier() -> DeclModifierListSyntax {
         filter({
-            $0.detail?.kind != TokenSyntax.identifier("set").kind
+            $0.detail?.detail.text != "set"
         })
     }
 }

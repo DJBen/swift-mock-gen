@@ -18,9 +18,9 @@ public struct FunctionExpectImplFactory {
 
     func declaration(
         protocolDecl: ProtocolDeclSyntax,
-        protocolFunctionDeclaration: FunctionDeclSyntax
+        protocolFunctionDecl: FunctionDeclSyntax
     ) throws -> FunctionDeclSyntax {
-        let parameters = protocolFunctionDeclaration.signature.parameterClause.parameters
+        let parameters = protocolFunctionDecl.signature.parameterClause.parameters
 
         var functionSigParams = parameters.map { (funcParamSyntax: FunctionParameterSyntax) in
             let name = (funcParamSyntax.secondName ?? funcParamSyntax.firstName).text
@@ -36,7 +36,7 @@ public struct FunctionExpectImplFactory {
                 return "\(name): Matching<\(type)>"
             }
         }
-        if let returnClause = protocolFunctionDeclaration.signature.returnClause {
+        if let returnClause = protocolFunctionDecl.signature.returnClause {
             if returnClause.type.isFunctionTypeSyntax {
                 functionSigParams.append("andReturn value: @escaping \(returnClause.type.trimmed)")
             } else {
@@ -53,9 +53,9 @@ public struct FunctionExpectImplFactory {
                     scopeModifier.trimmed
                 }
             },
-            funcKeyword: protocolFunctionDeclaration.funcKeyword.trimmed,
-            name: "expect_\(protocolFunctionDeclaration.name)",
-            genericParameterClause: protocolFunctionDeclaration.genericParameterClause,
+            funcKeyword: protocolFunctionDecl.funcKeyword.trimmed,
+            name: "expect_\(protocolFunctionDecl.name)",
+            genericParameterClause: protocolFunctionDecl.genericParameterClause,
             signature: FunctionSignatureSyntax(
                 parameterClause: FunctionParameterClauseSyntax(
                     parameters: FunctionParameterListSyntax {
@@ -65,24 +65,24 @@ public struct FunctionExpectImplFactory {
                     }
                 )
             ),
-            genericWhereClause: protocolFunctionDeclaration.genericWhereClause,
+            genericWhereClause: protocolFunctionDecl.genericWhereClause,
             bodyBuilder: {
                 var params = parameters.map { (funcParamSyntax: FunctionParameterSyntax) in
                     let name = (funcParamSyntax.secondName ?? funcParamSyntax.firstName).text
                     return "\(name): \(name)"
                 }
-                if let _ = protocolFunctionDeclaration.signature.returnClause {
+                if let _ = protocolFunctionDecl.signature.returnClause {
                     let _ = params.append("returnValue: value")
                 }
                 let paramString = params.joined(separator: ",\n")
                 DeclSyntax(
                 #"""
-                let stub = Stub_\#(protocolFunctionDeclaration.name)(
+                let stub = Stub_\#(protocolFunctionDecl.name)(
                 \#(raw: paramString)
                 )
                 """#
                 )
-                ExprSyntax(#"expectations_\#(protocolFunctionDeclaration.name).append((stub, expectation))"#)
+                ExprSyntax(#"expectations_\#(protocolFunctionDecl.name).append((stub, expectation))"#)
             }
         )
         .with(\.leadingTrivia, [.newlines(2)])

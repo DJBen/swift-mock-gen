@@ -5,12 +5,13 @@ import SwiftSyntax
 import CodeGenTesting
 
 final class FunctionMockNoDepImplFactoryTests: XCTestCase {
-    func testDeclarations() throws {
+    func test_handler1() throws {
         let result = try FunctionMockNoDepImplFactory().declaration(
             protocolDecl: TestCases.Case2.protocolDecl,
             protocolFunctionDecl: try FunctionDeclSyntax(
                 "func initialize(name: String, secondName: String?)"
-            )
+            ),
+            funcUniqueName: "initialize"
         )
 
         assertBuildResult(
@@ -37,7 +38,8 @@ final class FunctionMockNoDepImplFactoryTests: XCTestCase {
             protocolDecl: TestCases.Case2.protocolDecl,
             protocolFunctionDecl: try FunctionDeclSyntax(
                 "func fetchConfig() async throws -> [String: String]"
-            )
+            ),
+            funcUniqueName: "fetchConfig"
         )
 
         assertBuildResult(
@@ -64,7 +66,8 @@ final class FunctionMockNoDepImplFactoryTests: XCTestCase {
             protocolDecl: TestCases.Case2.protocolDecl,
             protocolFunctionDecl: try FunctionDeclSyntax(
                 "func fetchData(_ name: (String, count: Int)) async -> (() -> Void)"
-            )
+            ),
+            funcUniqueName: "fetchData"
         )
 
         assertBuildResult(
@@ -81,6 +84,34 @@ final class FunctionMockNoDepImplFactoryTests: XCTestCase {
                     return await handler(name)
                 }
                 fatalError("Please set handler_fetchData")
+            }
+            """#
+        )
+    }
+
+    func test_dedupeMethodSignature() throws {
+        let result = try FunctionMockNoDepImplFactory().declaration(
+            protocolDecl: TestCases.Case3.protocolDecl,
+            protocolFunctionDecl: try FunctionDeclSyntax(
+                "func reportError(_ error: Error, description: String)"
+            ),
+            funcUniqueName: "reportErrorDescription"
+        )
+
+        assertBuildResult(
+            result,
+            #"""
+
+
+            public func reportError(_ error: Error, description: String) {
+                let invocation = Invocation_reportErrorDescription(
+                    error: error,
+                    description: description
+                )
+                invocations_reportErrorDescription.append(invocation)
+                if let handler = handler_reportErrorDescription {
+                    handler(error, description)
+                }
             }
             """#
         )

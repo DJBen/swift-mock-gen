@@ -8,7 +8,7 @@ final class FunctionExpectImplFactoryTests: XCTestCase {
     func testDeclaration() throws {
         let result = try FunctionExpectImplFactory().declaration(
             protocolDecl: TestCases.Case1.protocolDecl,
-            protocolFunctionDeclaration: TestCases.Case1.functionDecl
+            protocolFunctionDecl: TestCases.Case1.functionDecl
         )
 
         assertBuildResult(

@@ -6,7 +6,8 @@ public struct FunctionMockNoDepImplFactory {
 
     func declaration(
         protocolDecl: ProtocolDeclSyntax,
-        protocolFunctionDecl: FunctionDeclSyntax
+        protocolFunctionDecl: FunctionDeclSyntax,
+        funcUniqueName: String
     ) throws -> FunctionDeclSyntax {
         // Append scope modifier to the function (public, internal, ...)
         var modifiers = protocolFunctionDecl.modifiers
@@ -33,13 +34,13 @@ public struct FunctionMockNoDepImplFactory {
                     }
                 }.joined(separator: ",\n")
                 DeclSyntax("""
-                let invocation = Invocation_\(protocolFunctionDecl.name)(
+                let invocation = Invocation_\(raw: funcUniqueName)(
                 \(raw: invocationInitializerParams)
                 )
                 """)
-                ExprSyntax("invocations_\(protocolFunctionDecl.name).append(invocation)")
+                ExprSyntax("invocations_\(raw: funcUniqueName).append(invocation)")
 
-                try IfExprSyntax("if let handler = handler_\(protocolFunctionDecl.name)") {
+                try IfExprSyntax("if let handler = handler_\(raw: funcUniqueName)") {
                     let invocationParams = parameters.compactMap { (funcParamSyntax: FunctionParameterSyntax) in
                         let name = (funcParamSyntax.secondName ?? funcParamSyntax.firstName).text
                         return name

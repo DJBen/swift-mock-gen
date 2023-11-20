@@ -7,25 +7,25 @@ public struct FunctionMockImplFactory {
 
     func declaration(
         protocolDecl: ProtocolDeclSyntax,
-        protocolFunctionDeclaration: FunctionDeclSyntax
+        protocolFunctionDecl: FunctionDeclSyntax
     ) throws -> FunctionDeclSyntax {
         // Append scope modifier to the function (public, internal, ...)
-        var modifiers = protocolFunctionDeclaration.modifiers
+        var modifiers = protocolFunctionDecl.modifiers
         modifiers.clearScopeModifier()
         if let scopeModifier = protocolDecl.modifiers.scopeModifier {
             modifiers.append(scopeModifier.trimmed)
         }
         return try FunctionDeclSyntax(
-            attributes: protocolFunctionDeclaration.attributes.trimmed,
+            attributes: protocolFunctionDecl.attributes.trimmed,
             modifiers: modifiers.trimmed,
-            funcKeyword: protocolFunctionDeclaration.funcKeyword.trimmed,
-            name: protocolFunctionDeclaration.name,
-            genericParameterClause: protocolFunctionDeclaration.genericParameterClause,
-            signature: protocolFunctionDeclaration.signature,
-            genericWhereClause: protocolFunctionDeclaration.genericWhereClause,
+            funcKeyword: protocolFunctionDecl.funcKeyword.trimmed,
+            name: protocolFunctionDecl.name,
+            genericParameterClause: protocolFunctionDecl.genericParameterClause,
+            signature: protocolFunctionDecl.signature,
+            genericWhereClause: protocolFunctionDecl.genericWhereClause,
             bodyBuilder: {
-                let parameters = protocolFunctionDeclaration.signature.parameterClause.parameters
-                let expectationsVariableName = "expectations_\(protocolFunctionDeclaration.name)"
+                let parameters = protocolFunctionDecl.signature.parameterClause.parameters
+                let expectationsVariableName = "expectations_\(protocolFunctionDecl.name)"
 
                 let invocationInitializerParams = parameters.map { (funcParamSyntax: FunctionParameterSyntax) in
                     let name = (funcParamSyntax.secondName ?? funcParamSyntax.firstName).text
@@ -36,11 +36,11 @@ public struct FunctionMockImplFactory {
                     }
                 }.joined(separator: ",\n")
                 DeclSyntax("""
-                let invocation = Invocation_\(protocolFunctionDeclaration.name)(
+                let invocation = Invocation_\(protocolFunctionDecl.name)(
                 \(raw: invocationInitializerParams)
                 )
                 """)
-                ExprSyntax("invocations_\(protocolFunctionDeclaration.name).append(invocation)")
+                ExprSyntax("invocations_\(protocolFunctionDecl.name).append(invocation)")
 
                 let codeBlockItemListSyntax = try CodeBlockItemListSyntax {
                     let blockNamesAndParams = parameters.compactMap {
@@ -64,7 +64,7 @@ public struct FunctionMockImplFactory {
                             }
                         }
                     }
-                    if let _ = protocolFunctionDeclaration.signature.returnClause {
+                    if let _ = protocolFunctionDecl.signature.returnClause {
                         ReturnStmtSyntax(expression: ExprSyntax("stub.returnValue"))
                     }
                 }
@@ -86,7 +86,7 @@ public struct FunctionMockImplFactory {
                     }
                 }
 
-                if let _ = protocolFunctionDeclaration.signature.returnClause {
+                if let _ = protocolFunctionDecl.signature.returnClause {
                     // Generate a parameter list for the fatalError
                     // Invocations don't include function types, so we omit them.
                     // e.g. performRequest(request: \(request), reportId: \(reportId), includeLogs: \(includeLogs), onSuccess:…, onPermanentFailure:…)
@@ -100,7 +100,7 @@ public struct FunctionMockImplFactory {
                     }.joined(separator: ", ")
 
                     ExprSyntax(#"""
-                    fatalError("Unexpected invocation of \#(protocolFunctionDeclaration.name)(\#(raw: fatalErrorParams)). Could not continue without a return value. Did you stub it?")
+                    fatalError("Unexpected invocation of \#(protocolFunctionDecl.name)(\#(raw: fatalErrorParams)). Could not continue without a return value. Did you stub it?")
                     """#)
                 }
             }

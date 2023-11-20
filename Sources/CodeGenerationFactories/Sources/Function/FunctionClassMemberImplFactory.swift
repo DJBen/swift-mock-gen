@@ -12,7 +12,8 @@ public struct FunctionClassMemberImplFactory {
 
     func declarations(
         protocolDecl: ProtocolDeclSyntax,
-        protocolFunctionDeclaration: FunctionDeclSyntax
+        protocolFunctionDecl: FunctionDeclSyntax,
+        funcUniqueName: String
     ) throws -> [DeclSyntax] {
         let modifiers = DeclModifierListSyntax {
             if let scopeModifier = protocolDecl.modifiers.scopeModifier {
@@ -20,13 +21,13 @@ public struct FunctionClassMemberImplFactory {
             }
         }
 
-        let parameters = protocolFunctionDeclaration.signature.parameterClause.parameters
+        let parameters = protocolFunctionDecl.signature.parameterClause.parameters
 
         return [
             DeclSyntax(
                 StructDeclSyntax(
                     modifiers: modifiers.trimmed,
-                    name: "Stub_\(protocolFunctionDeclaration.name)",
+                    name: "Stub_\(protocolFunctionDecl.name)",
                     memberBlock: try MemberBlockSyntax {
                         for funcParamSyntax in parameters {
                             let name = (funcParamSyntax.secondName ?? funcParamSyntax.firstName).text
@@ -42,11 +43,11 @@ public struct FunctionClassMemberImplFactory {
                             }
                         }
 
-                        if let returnClause = protocolFunctionDeclaration.signature.returnClause {
+                        if let returnClause = protocolFunctionDecl.signature.returnClause {
                             try VariableDeclSyntax("let returnValue: \(returnClause.type)")
                         }
 
-                        try FunctionDeclSyntax("func matches(_ invocation: Invocation_\(protocolFunctionDeclaration.name)) -> Bool") {
+                        try FunctionDeclSyntax("func matches(_ invocation: Invocation_\(protocolFunctionDecl.name)) -> Bool") {
                             let nonFunctionalParams = parameters.filter {
                                 !$0.type.isFunctionTypeSyntax
                             }
@@ -66,11 +67,12 @@ public struct FunctionClassMemberImplFactory {
                 )
             ),
             DeclSyntax(
-                try VariableDeclSyntax("private (set) var expectations_\(protocolFunctionDeclaration.name): [(Stub_\(protocolFunctionDeclaration.name), Expectation?)] = []")
+                try VariableDeclSyntax("private (set) var expectations_\(protocolFunctionDecl.name): [(Stub_\(protocolFunctionDecl.name), Expectation?)] = []")
             ),
         ] + (try functionInvocationImplFactory.decls(
             protocolDecl: protocolDecl,
-            protocolFunctionDeclaration: protocolFunctionDeclaration
+            protocolFunctionDecl: protocolFunctionDecl,
+            funcUniqueName: funcUniqueName
         ))
     }
 }

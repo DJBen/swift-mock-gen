@@ -1,6 +1,8 @@
 import Foundation
 #if DEBUG
-public class ServiceNoDepMock: NSObject, ServiceProtocol  {
+public class ServiceNoDepMock: ServiceProtocol  {
+    public init() {
+    }
 
     public var name: String {
         get {

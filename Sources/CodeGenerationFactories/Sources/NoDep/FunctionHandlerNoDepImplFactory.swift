@@ -6,7 +6,8 @@ public struct FunctionHandlerNoDepImplFactory {
 
     func declaration(
         protocolDecl: ProtocolDeclSyntax,
-        protocolFunctionDecl: FunctionDeclSyntax
+        protocolFunctionDecl: FunctionDeclSyntax,
+        funcUniqueName: String
     ) throws -> VariableDeclSyntax {
         // Append protocol scope modifier to the function (public, internal, ...)
         var modifiers = protocolFunctionDecl.modifiers
@@ -19,7 +20,7 @@ public struct FunctionHandlerNoDepImplFactory {
             attributes: [],
             modifiers: modifiers,
             .var,
-            name: PatternSyntax("handler_\(protocolFunctionDecl.name)"),
+            name: PatternSyntax("handler_\(raw: funcUniqueName)"),
             type: TypeAnnotationSyntax(
                 type: OptionalTypeSyntax(
                     wrappedType: TupleTypeSyntax(

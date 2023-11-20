@@ -78,6 +78,14 @@ public struct MockClassFactory {
                 ) {}
             }
 
+            let funcDecls = protocolDecl.memberBlock.members.compactMap { member -> FunctionDeclSyntax? in
+                return member.decl.as(FunctionDeclSyntax.self)
+            }
+            let deduper = FuncNameDeduper(
+                protocolDecl: protocolDecl,
+                funcDecls: funcDecls
+            )
+
             for member in protocolDecl.memberBlock.members {
                 if let protocolFunctionDecl = member.decl.as(VariableDeclSyntax.self) {
                     for decl in try variableImplFactory.decls(
@@ -86,32 +94,33 @@ public struct MockClassFactory {
                     ) {
                         MemberBlockItemSyntax(decl: decl)
                     }
-                } else if let protocolFunctionDeclaration = member.decl.as(FunctionDeclSyntax.self) {
+                } else if let protocolFunctionDecl = member.decl.as(FunctionDeclSyntax.self) {
                     for decl in try funcClassMemberImplFactory.declarations(
                         protocolDecl: protocolDecl,
-                        protocolFunctionDeclaration: protocolFunctionDeclaration
+                        protocolFunctionDecl: protocolFunctionDecl,
+                        funcUniqueName: deduper.name(for: protocolFunctionDecl)
                     ) {
                         MemberBlockItemSyntax(decl: decl)
                     }
 
                     try funcMockImplFactory.declaration(
                         protocolDecl: protocolDecl,
-                        protocolFunctionDeclaration: protocolFunctionDeclaration
+                        protocolFunctionDecl: protocolFunctionDecl
                     )
 
                     try funcStubImplFactory.declaration(
                         protocolDecl: protocolDecl,
-                        protocolFunctionDeclaration: protocolFunctionDeclaration
+                        protocolFunctionDecl: protocolFunctionDecl
                     )
 
                     try funcExpectImplFactory.declaration(
                         protocolDecl: protocolDecl,
-                        protocolFunctionDeclaration: protocolFunctionDeclaration
+                        protocolFunctionDecl: protocolFunctionDecl
                     )
 
                     try funcVerifyImplFactory.declaration(
                         protocolDecl: protocolDecl,
-                        protocolFunctionDeclaration: protocolFunctionDeclaration
+                        protocolFunctionDecl: protocolFunctionDecl
                     )
                 }
             }

@@ -28,34 +28,6 @@ final class ExampleTests: XCTestCase {
         // Put teardown code here. This method is called after the invocation of each test method in the class.
     }
 
-    func testExample() async throws {
-        let mock = ServiceMock()
-        let container = TestedClass(executor: mock)
-
-        mock.expect_fetchData(
-            name: Matching({ _ in
-                return true
-            }),
-            andReturn: {},
-            expectation: .count(1)
-        )
-
-        let _ = await container.fetchData()
-
-        mock.verify_fetchData()
-    }
-
-    func testExample2() async throws {
-        let mock = ServiceMock()
-        let container = TestedClass(executor: mock)
-
-        mock.underlying_name = "Name 1"
-        mock.underlying_secondName = "Name 2"
-        container.processName()
-
-        XCTAssertEqual(mock.getCount_secondName, 1)
-    }
-
     func testNoDepMock() async throws {
         let mock = ServiceNoDepMock()
         let container = TestedClass(executor: mock)

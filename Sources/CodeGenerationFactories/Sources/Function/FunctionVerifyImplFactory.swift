@@ -12,9 +12,9 @@ public struct FunctionVerifyImplFactory {
 
     func declaration(
         protocolDecl: ProtocolDeclSyntax,
-        protocolFunctionDeclaration: FunctionDeclSyntax
+        protocolFunctionDecl: FunctionDeclSyntax
     ) throws -> FunctionDeclSyntax {
-        let parameters = protocolFunctionDeclaration.signature.parameterClause.parameters
+        let parameters = protocolFunctionDecl.signature.parameterClause.parameters
 
         let expecationVerifyParams = parameters.map { (funcParamSyntax: FunctionParameterSyntax) in
             let name = (funcParamSyntax.secondName ?? funcParamSyntax.firstName).text
@@ -47,21 +47,21 @@ public struct FunctionVerifyImplFactory {
                     scopeModifier.trimmed
                 }
             },
-            funcKeyword: protocolFunctionDeclaration.funcKeyword.trimmed,
-            name: "verify_\(protocolFunctionDeclaration.name)",
-            genericParameterClause: protocolFunctionDeclaration.genericParameterClause,
+            funcKeyword: protocolFunctionDecl.funcKeyword.trimmed,
+            name: "verify_\(protocolFunctionDecl.name)",
+            genericParameterClause: protocolFunctionDecl.genericParameterClause,
             signature: FunctionSignatureSyntax(
                 parameterClause: FunctionParameterClauseSyntax(
                     parameters: FunctionParameterListSyntax { [] }
                 )
             ),
-            genericWhereClause: protocolFunctionDeclaration.genericWhereClause,
+            genericWhereClause: protocolFunctionDecl.genericWhereClause,
             bodyBuilder: {
-                DeclSyntax(#"var invocations = invocations_\#(protocolFunctionDeclaration.name)"#)
+                DeclSyntax(#"var invocations = invocations_\#(protocolFunctionDecl.name)"#)
 
                 StmtSyntax(
                 ##"""
-                for (stub, expectation) in expectations_\##(protocolFunctionDeclaration.name).reversed() {
+                for (stub, expectation) in expectations_\##(protocolFunctionDecl.name).reversed() {
                     var matchedCalls = 0
                     var index = 0
                     while index < invocations.count {
@@ -73,7 +73,7 @@ public struct FunctionVerifyImplFactory {
                         }
                     }
                     expectation?.callCountPredicate.verify(
-                        methodSignature:#"\##(protocolFunctionDeclaration.name)(\##(raw: expecationVerifyParams))"#,
+                        methodSignature:#"\##(protocolFunctionDecl.name)(\##(raw: expecationVerifyParams))"#,
                         callCount: matchedCalls
                     )
                 }
@@ -83,7 +83,7 @@ public struct FunctionVerifyImplFactory {
                 StmtSyntax(
                 #"""
                 for invocation in invocations {
-                    XCTFail("These invocations are made but not expected: \#(protocolFunctionDeclaration.name)(\#(raw: unexpectedInvocationParams))")
+                    XCTFail("These invocations are made but not expected: \#(protocolFunctionDecl.name)(\#(raw: unexpectedInvocationParams))")
                 }
                 """#
                 )

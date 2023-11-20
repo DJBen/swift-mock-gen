@@ -7,7 +7,7 @@ final class FunctionMockImplFactoryTests: XCTestCase {
     func test_performRequest() throws {
         let result = try FunctionMockImplFactory().declaration(
             protocolDecl: TestCases.Case1.protocolDecl,
-            protocolFunctionDeclaration: TestCases.Case1.functionDecl
+            protocolFunctionDecl: TestCases.Case1.functionDecl
         )
 
         assertBuildResult(
@@ -50,7 +50,7 @@ final class FunctionMockImplFactoryTests: XCTestCase {
     func test_emptyParams() throws {
         let result = try FunctionMockImplFactory().declaration(
             protocolDecl: TestCases.Case2.protocolDecl,
-            protocolFunctionDeclaration: try! FunctionDeclSyntax(
+            protocolFunctionDecl: try! FunctionDeclSyntax(
                 #"""
                 func fetchConfig() async throws -> [String: String]
                 """#

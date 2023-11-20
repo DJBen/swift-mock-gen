@@ -72,6 +72,14 @@ public struct NoDepMockClassFactory {
                 ) {}
             }
 
+            let funcDecls = protocolDecl.memberBlock.members.compactMap { member -> FunctionDeclSyntax? in
+                return member.decl.as(FunctionDeclSyntax.self)
+            }
+            let deduper = FuncNameDeduper(
+                protocolDecl: protocolDecl,
+                funcDecls: funcDecls
+            )
+
             for member in protocolDecl.memberBlock.members {
                 if let protocolFunctionDecl = member.decl.as(VariableDeclSyntax.self) {
                     for decl in try variableImplFactory.decls(
@@ -80,22 +88,25 @@ public struct NoDepMockClassFactory {
                     ) {
                         MemberBlockItemSyntax(decl: decl)
                     }
-                } else if let protocolFunctionDeclaration = member.decl.as(FunctionDeclSyntax.self) {
+                } else if let protocolFunctionDecl = member.decl.as(FunctionDeclSyntax.self) {
                     for decl in try functionInvocationImplFactory.decls(
                         protocolDecl: protocolDecl,
-                        protocolFunctionDeclaration: protocolFunctionDeclaration
+                        protocolFunctionDecl: protocolFunctionDecl,
+                        funcUniqueName: deduper.name(for: protocolFunctionDecl)
                     ) {
                         MemberBlockItemSyntax(decl: decl)
                     }
 
                     try functionHandlerImplFactory.declaration(
                         protocolDecl: protocolDecl,
-                        protocolFunctionDecl: protocolFunctionDeclaration
+                        protocolFunctionDecl: protocolFunctionDecl,
+                        funcUniqueName: deduper.name(for: protocolFunctionDecl)
                     )
 
                     try funcMockImplFactory.declaration(
                         protocolDecl: protocolDecl,
-                        protocolFunctionDecl: protocolFunctionDeclaration
+                        protocolFunctionDecl: protocolFunctionDecl,
+                        funcUniqueName: deduper.name(for: protocolFunctionDecl)
                     )
                 }
             }

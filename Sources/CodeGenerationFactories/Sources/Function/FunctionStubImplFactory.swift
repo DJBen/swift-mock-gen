@@ -18,9 +18,9 @@ public struct FunctionStubImplFactory {
 
     func declaration(
         protocolDecl: ProtocolDeclSyntax,
-        protocolFunctionDeclaration: FunctionDeclSyntax
+        protocolFunctionDecl: FunctionDeclSyntax
     ) throws -> FunctionDeclSyntax {
-        let parameters = protocolFunctionDeclaration.signature.parameterClause.parameters
+        let parameters = protocolFunctionDecl.signature.parameterClause.parameters
 
         var functionSigParams = parameters.map { (funcParamSyntax: FunctionParameterSyntax) in
             let name = (funcParamSyntax.secondName ?? funcParamSyntax.firstName).text
@@ -36,7 +36,7 @@ public struct FunctionStubImplFactory {
                 return "\(name): Matching<\(type)>"
             }
         }
-        if let returnClause = protocolFunctionDeclaration.signature.returnClause {
+        if let returnClause = protocolFunctionDecl.signature.returnClause {
             if returnClause.type.isFunctionTypeSyntax {
                 functionSigParams.append("andReturn value: @escaping \(returnClause.type.trimmed)")
             } else {
@@ -52,9 +52,9 @@ public struct FunctionStubImplFactory {
                     scopeModifier.trimmed
                 }
             },
-            funcKeyword: protocolFunctionDeclaration.funcKeyword.trimmed,
-            name: "stub_\(protocolFunctionDeclaration.name)",
-            genericParameterClause: protocolFunctionDeclaration.genericParameterClause,
+            funcKeyword: protocolFunctionDecl.funcKeyword.trimmed,
+            name: "stub_\(protocolFunctionDecl.name)",
+            genericParameterClause: protocolFunctionDecl.genericParameterClause,
             signature: FunctionSignatureSyntax(
                 parameterClause: FunctionParameterClauseSyntax(
                     parameters: FunctionParameterListSyntax {
@@ -64,20 +64,20 @@ public struct FunctionStubImplFactory {
                     }
                 )
             ),
-            genericWhereClause: protocolFunctionDeclaration.genericWhereClause,
+            genericWhereClause: protocolFunctionDecl.genericWhereClause,
             bodyBuilder: {
                 var params = parameters.map { (funcParamSyntax: FunctionParameterSyntax) in
                     let name = (funcParamSyntax.secondName ?? funcParamSyntax.firstName).text
                     return "\(name): \(name)"
                 }
-                if let _ = protocolFunctionDeclaration.signature.returnClause {
+                if let _ = protocolFunctionDecl.signature.returnClause {
                     let _ = params.append("andReturn: value")
                 }
                 let _ = params.append("expectation: nil")
                 let paramString = params.joined(separator: ",\n")
                 ExprSyntax(
                 #"""
-                expect_\#(raw: protocolFunctionDeclaration.name)(
+                expect_\#(raw: protocolFunctionDecl.name)(
                 \#(raw: paramString)
                 )
                 """#

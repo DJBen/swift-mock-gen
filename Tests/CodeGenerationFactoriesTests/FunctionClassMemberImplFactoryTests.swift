@@ -9,7 +9,8 @@ final class FunctionClassMemberImplFactoryTests: XCTestCase {
         let result = try MemberBlockItemListSyntax {
             for member in try FunctionClassMemberImplFactory().declarations(
                 protocolDecl: TestCases.Case1.protocolDecl,
-                protocolFunctionDeclaration: TestCases.Case1.functionDecl
+                protocolFunctionDecl: TestCases.Case1.functionDecl,
+                funcUniqueName: "performRequest"
             ) {
                 MemberBlockItemSyntax(decl: member)
             }
@@ -46,11 +47,12 @@ final class FunctionClassMemberImplFactoryTests: XCTestCase {
         let result = try MemberBlockItemListSyntax {
             for member in try FunctionClassMemberImplFactory().declarations(
                 protocolDecl: TestCases.Case2.protocolDecl,
-                protocolFunctionDeclaration: try! FunctionDeclSyntax(
+                protocolFunctionDecl: try! FunctionDeclSyntax(
                     #"""
                     func fetchConfig() async throws -> [String: String]
                     """#
-                )
+                ),
+                funcUniqueName: "fetchConfig"
             ) {
                 MemberBlockItemSyntax(decl: member)
             }
