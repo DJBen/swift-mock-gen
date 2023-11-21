@@ -10,7 +10,7 @@ public struct FunctionClassMemberImplFactory {
         self.functionInvocationImplFactory = functionInvocationImplFactory
     }
 
-    func declarations(
+    public func declarations(
         protocolDecl: ProtocolDeclSyntax,
         protocolFunctionDecl: FunctionDeclSyntax,
         funcUniqueName: String

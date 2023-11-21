@@ -4,7 +4,7 @@ import SwiftSyntaxBuilder
 public struct FunctionInvocationImplFactory {
     public init() {}
 
-    func decls(
+    public func decls(
         protocolDecl: ProtocolDeclSyntax,
         protocolFunctionDecl: FunctionDeclSyntax,
         funcUniqueName: String

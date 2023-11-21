@@ -12,7 +12,7 @@ final class MockClassFactoryTests: XCTestCase {
         assertBuildResult(
             result,
             ##"""
-            public class SCCrashLoggerNetworkExecutorMock: NSObject, SCCrashLoggerNetworkExecuting {
+            public class SCCrashLoggerNetworkExecutingMock: NSObject, SCCrashLoggerNetworkExecuting {
                 public struct Stub_performRequest {
                     let request: Matching<URLRequest>
                     let reportId: Matching<String>

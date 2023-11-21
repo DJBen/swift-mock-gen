@@ -4,7 +4,7 @@ import SwiftSyntaxBuilder
 public struct VariableImplFactory {
     public init() {}
 
-    func decls(
+    public func decls(
         protocolDecl: ProtocolDeclSyntax,
         protocolVariableDecl: VariableDeclSyntax
     ) throws -> [any DeclSyntaxProtocol] {

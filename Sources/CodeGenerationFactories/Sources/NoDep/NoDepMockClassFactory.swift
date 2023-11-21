@@ -23,15 +23,11 @@ public struct NoDepMockClassFactory {
         protocolDecl: ProtocolDeclSyntax
     ) throws -> some DeclSyntaxProtocol {
         // Name rule:
-        // - If ending with `-ing`, replace with `-or` and append `Mock`.
         // - If ending with `-Protocol`, remove and append `Mock`.
         // - Otherwise, append `Mock` without any changes.
         let name = {
             var trimmedText = protocolDecl.name.trimmed.text
-            if trimmedText.hasSuffix("ing") {
-                trimmedText.removeLast(3)
-                trimmedText.append("or")
-            } else if trimmedText.hasSuffix("Protocol") {
+            if trimmedText.hasSuffix("Protocol") {
                 trimmedText.removeLast("Protocol".lengthOfBytes(using: .utf8))
             }
             trimmedText.append("Mock")

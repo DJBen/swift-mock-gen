@@ -5,7 +5,7 @@ import SwiftSyntaxBuilder
 public struct FunctionMockImplFactory {
     public init() {}
 
-    func declaration(
+    public func declaration(
         protocolDecl: ProtocolDeclSyntax,
         protocolFunctionDecl: FunctionDeclSyntax
     ) throws -> FunctionDeclSyntax {

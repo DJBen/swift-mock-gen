@@ -1,5 +1,3 @@
-// Copyright © 2023 Snap, Inc. All rights reserved.
-
 import Foundation
 import SwiftSyntax
 

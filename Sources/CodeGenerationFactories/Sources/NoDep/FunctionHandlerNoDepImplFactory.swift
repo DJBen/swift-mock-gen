@@ -4,7 +4,7 @@ import SwiftSyntaxBuilder
 public struct FunctionHandlerNoDepImplFactory {
     public init() {}
 
-    func declaration(
+    public func declaration(
         protocolDecl: ProtocolDeclSyntax,
         protocolFunctionDecl: FunctionDeclSyntax,
         funcUniqueName: String

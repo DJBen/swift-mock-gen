@@ -10,7 +10,7 @@ import SwiftSyntaxBuilder
 public struct FunctionVerifyImplFactory {
     public init() {}
 
-    func declaration(
+    public func declaration(
         protocolDecl: ProtocolDeclSyntax,
         protocolFunctionDecl: FunctionDeclSyntax
     ) throws -> FunctionDeclSyntax {

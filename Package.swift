@@ -11,6 +11,7 @@ let package = Package(
   ],
   products: [
     .executable(name: "swift-mock-gen", targets: ["swift-mock-gen"]),
+    .library(name: "SwiftMockGen", targets: ["SwiftMockGen"]),
     .library(name: "MockSupport", targets: ["MockSupport"]),
   ],
   dependencies: [
@@ -21,6 +22,7 @@ let package = Package(
     .macro(
         name: "SwiftMockGenMacro",
         dependencies: [
+            "CodeGenerationFactories",
             .product(name: "SwiftSyntaxMacros", package: "swift-syntax"),
             .product(name: "SwiftCompilerPlugin", package: "swift-syntax")
         ]
@@ -31,7 +33,10 @@ let package = Package(
     ),
 
     .target(
-      name: "SwiftMockGen"
+      name: "SwiftMockGen",
+      dependencies: [
+        "SwiftMockGenMacro"
+      ]
     ),
 
     .target(
@@ -58,6 +63,15 @@ let package = Package(
         dependencies: [
             "CodeGenerationFactories",
             "CodeGenTesting",
+        ]
+    ),
+
+    .testTarget(
+        name: "SwiftMockGenMacroTests",
+        dependencies: [
+            "SwiftMockGenMacro",
+            "CodeGenerationFactories",
+            .product(name: "SwiftSyntaxMacrosTestSupport", package: "swift-syntax"),
         ]
     ),
 
