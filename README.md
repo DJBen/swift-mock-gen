@@ -7,6 +7,22 @@ Alternatively if you are developing it, you may use `swift run swift-mock-gen ..
 You can also open the `SwiftMockGen` package and building the `swift-mock-gen` target in Xcode.
 
 ## Generating mocks
+### Swift Macro
+
+Mark up the protocol declaration with `@GenerateMock`, a mock implementation will be generated
+for DEBUG build only. You are all set for writing unit tests whose subject depends on this protocol!
+
+```swift
+import SwiftMockGen
+
+@GenerateMock
+public protocol ServiceProtocol {
+   ...
+}
+```
+
+### Command Line Interface (CLI)
+
 Usage can be viewed by passing the `--help` or `-h` flag.
 ```bash
 $ .build/debug/swift-mock-gen gen -h
