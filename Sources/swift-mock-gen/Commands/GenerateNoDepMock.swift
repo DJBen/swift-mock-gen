@@ -25,6 +25,8 @@ struct GenerateNoDepMock: ParsableCommand, ParseCommand {
     )
     var copyImports: Bool = false
 
+    var additionalImports: String = ""
+
     func run() throws {
         try sourceFileContents.withUnsafeBufferPointer { sourceBuffer in
             let tree = Parser.parse(source: sourceBuffer)

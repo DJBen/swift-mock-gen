@@ -32,10 +32,6 @@ class SwiftMockGen: ParsableCommand {
     subcommands: [
       BasicFormat.self,
       PerformanceTest.self,
-      PrintDiags.self,
-      PrintTree.self,
-      Reduce.self,
-      VerifyRoundTrip.self,
       GenerateMock.self,
       GenerateNoDepMock.self,
     ]

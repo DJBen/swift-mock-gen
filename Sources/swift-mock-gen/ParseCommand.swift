@@ -18,9 +18,6 @@ struct ParseArguments: ParsableArguments {
 
   @Option(name: [.long, .short], help: "If passed, parse this source text instead of reading source file")
   var source: String?
-
-  @Flag(name: .long, help: "Perform sequence folding with the standard operators")
-  var foldSequences: Bool = false
 }
 
 /// A command  that has arguments to parse source code
@@ -47,7 +44,4 @@ extension ParseCommand {
       return try getContentsOfSourceFile(at: arguments.sourceFile)
     }
   }
-
-  /// Whether sequence folding using standard operators should be performed
-  var foldSequences: Bool { arguments.foldSequences }
 }

@@ -74,11 +74,8 @@ struct BasicFormat: ParsableCommand, ParseCommand {
     }
 
     let resultTree: Syntax
-    if foldSequences {
-      resultTree = foldAllSequences(tree).0
-    } else {
-      resultTree = Syntax(tree)
-    }
+    resultTree = Syntax(tree)
+
 
     if resultTree.hasError {
       let diags = ParseDiagnosticsGenerator.diagnostics(for: tree)
