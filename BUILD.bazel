@@ -42,5 +42,7 @@ swift_test(
     deps = [
         ":CodeGenerationFactories",
         ":CodeGenTesting",
+        "@swift_syntax//:SwiftSyntax",
+        "@swift_syntax//:SwiftSyntaxBuilder",
     ],
 )
