@@ -29,18 +29,18 @@ http_archive(
     ],
 )
 
-load("@bazel_tools//tools/build_defs/repo:git.bzl", "git_repository")
-
-# http_archive(
-#     name = "swift_syntax",
-#     sha256 = "1a516cf344e4910329e3ba28e04f53f457bba23e71e7a4a980515ccc29685dbc",
-#     urls = [
-#         "https://github.com/apple/swift-syntax/archive/refs/tags/509.0.2.tar.gz",
-#     ]
-# )
-
-git_repository(
+http_archive(
     name = "swift_syntax",
-    tag = "509.0.2",
-    remote = "https://github.com/apple/swift-syntax.git",
+    sha256 = "1a516cf344e4910329e3ba28e04f53f457bba23e71e7a4a980515ccc29685dbc",
+    urls = [
+        "https://github.com/apple/swift-syntax/archive/refs/tags/509.0.2.tar.gz",
+    ]
 )
+
+# load("@bazel_tools//tools/build_defs/repo:git.bzl", "git_repository")
+
+# git_repository(
+#     name = "swift_syntax",
+#     tag = "509.0.2",
+#     remote = "https://github.com/apple/swift-syntax.git",
+# )
