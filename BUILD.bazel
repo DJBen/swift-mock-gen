@@ -28,6 +28,7 @@ swift_binary(
 swift_library(
     name = "CodeGenTesting",
     srcs = glob(["Sources/CodeGenTesting/**/*.swift"]),
+    testonly = True,
     deps = [
         "@swift_syntax//:SwiftSyntax",
         "@swift_syntax//:SwiftSyntaxMacrosTestSupport",

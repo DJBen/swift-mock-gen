@@ -30,7 +30,6 @@ class SwiftMockGen: ParsableCommand {
     abstract: "Utility to generate Swift mock implementations given a protocol.",
     subcommands: [
       BasicFormat.self,
-      PerformanceTest.self,
       GenerateMock.self,
       GenerateNoDepMock.self,
     ]
