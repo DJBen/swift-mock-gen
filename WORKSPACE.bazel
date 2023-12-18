@@ -1,0 +1,48 @@
+load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
+
+http_archive(
+    name = "build_bazel_rules_swift",
+    sha256 = "28a66ff5d97500f0304f4e8945d936fe0584e0d5b7a6f83258298007a93190ba",
+    url = "https://github.com/bazelbuild/rules_swift/releases/download/1.13.0/rules_swift.1.13.0.tar.gz",
+)
+
+load(
+    "@build_bazel_rules_swift//swift:repositories.bzl",
+    "swift_rules_dependencies",
+)
+
+swift_rules_dependencies()
+
+load(
+    "@build_bazel_rules_swift//swift:extras.bzl",
+    "swift_rules_extra_dependencies",
+)
+
+swift_rules_extra_dependencies()
+
+http_archive(
+    name = "swift_argument_parser",
+    build_file = "@//:third_party/swift_argument_parser/BUILD.bazel.in",
+    sha256 = "e5010ff37b542807346927ba68b7f06365a53cf49d36a6df13cef50d86018204",
+    strip_prefix = "swift-argument-parser-1.3.0",
+    urls = [
+        "https://github.com/apple/swift-argument-parser/archive/refs/tags/1.3.0.tar.gz",
+    ],
+)
+
+http_archive(
+    name = "swift_syntax",
+    sha256 = "1a516cf344e4910329e3ba28e04f53f457bba23e71e7a4a980515ccc29685dbc",
+    strip_prefix = "swift-syntax-509.0.2",
+    urls = [
+        "https://github.com/apple/swift-syntax/archive/refs/tags/509.0.2.tar.gz",
+    ]
+)
+
+# load("@bazel_tools//tools/build_defs/repo:git.bzl", "git_repository")
+
+# git_repository(
+#     name = "swift_syntax",
+#     tag = "509.0.2",
+#     remote = "https://github.com/apple/swift-syntax.git",
+# )

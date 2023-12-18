@@ -12,7 +12,6 @@
 
 import ArgumentParser
 import Foundation
-import InstructionCounter
 import SwiftDiagnostics
 import SwiftOperators
 import SwiftParser
@@ -31,7 +30,6 @@ class SwiftMockGen: ParsableCommand {
     abstract: "Utility to generate Swift mock implementations given a protocol.",
     subcommands: [
       BasicFormat.self,
-      PerformanceTest.self,
       GenerateMock.self,
       GenerateNoDepMock.self,
     ]

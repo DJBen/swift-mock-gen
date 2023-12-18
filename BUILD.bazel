@@ -1,0 +1,48 @@
+load("@build_bazel_rules_swift//swift:swift.bzl", "swift_library", "swift_binary", "swift_test")
+
+swift_library(
+    name = "CodeGenerationFactories",
+    srcs = glob(["Sources/CodeGenerationFactories/**/*.swift"]),
+    deps = [
+        "@swift_syntax//:SwiftSyntax",
+        "@swift_syntax//:SwiftSyntaxBuilder",
+    ],
+    visibility = ["//visibility:public"],
+)
+
+swift_binary(
+    name = "swift-mock-gen",
+    srcs = glob(["Sources/swift-mock-gen/**/*.swift"]),
+    deps = [
+        ":CodeGenerationFactories",
+        "@swift_syntax//:SwiftBasicFormat",
+        "@swift_syntax//:SwiftDiagnostics",
+        "@swift_syntax//:SwiftOperators",
+        "@swift_syntax//:SwiftParser",
+        "@swift_syntax//:SwiftParserDiagnostics",
+        "@swift_syntax//:SwiftSyntax",
+        "@swift_argument_parser//:ArgumentParser",
+    ],
+)
+
+swift_library(
+    name = "CodeGenTesting",
+    srcs = glob(["Sources/CodeGenTesting/**/*.swift"]),
+    testonly = True,
+    deps = [
+        "@swift_syntax//:SwiftSyntax",
+        "@swift_syntax//:SwiftSyntaxMacrosTestSupport",
+    ],
+    visibility = ["//visibility:public"],
+)
+
+swift_test(
+    name = "CodeGenerationFactoriesTests",
+    srcs = glob(["Tests/CodeGenerationFactoriesTests/**/*.swift"]),
+    deps = [
+        ":CodeGenerationFactories",
+        ":CodeGenTesting",
+        "@swift_syntax//:SwiftSyntax",
+        "@swift_syntax//:SwiftSyntaxBuilder",
+    ],
+)
