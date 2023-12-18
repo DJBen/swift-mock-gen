@@ -29,10 +29,6 @@ let package = Package(
     ),
 
     .target(
-      name: "InstructionCounter"
-    ),
-
-    .target(
       name: "SwiftMockGen",
       dependencies: [
         "SwiftMockGenMacro"
@@ -86,7 +82,6 @@ let package = Package(
     .executableTarget(
       name: "swift-mock-gen",
       dependencies: [
-        "InstructionCounter",
         "CodeGenerationFactories",
         .product(name: "SwiftBasicFormat", package: "swift-syntax"),
         .product(name: "SwiftDiagnostics", package: "swift-syntax"),

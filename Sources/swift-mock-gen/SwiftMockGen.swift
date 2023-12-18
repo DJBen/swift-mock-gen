@@ -12,7 +12,6 @@
 
 import ArgumentParser
 import Foundation
-import InstructionCounter
 import SwiftDiagnostics
 import SwiftOperators
 import SwiftParser
