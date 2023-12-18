@@ -1,7 +1,0 @@
-version: 1
-on:
-  comment:
-    - body: "/deploy"
-      jobs:
-        - script: snapci/deploy.sh
-          run_on: "mac_studio"

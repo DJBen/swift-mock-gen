@@ -1,0 +1,15 @@
+name: Deploy to GCS
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Run Deploy Script
+        run: ./snapci/deploy.sh
+        shell: bash
