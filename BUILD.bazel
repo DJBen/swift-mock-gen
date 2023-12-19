@@ -1,9 +1,10 @@
-load("@build_bazel_rules_swift//swift:swift.bzl", "swift_library", "swift_binary", "swift_test")
+load("@build_bazel_rules_swift//swift:swift.bzl", "swift_library", "swift_binary", "swift_compiler_plugin", "swift_test")
 
 swift_library(
     name = "CodeGenerationFactories",
     srcs = glob(["Sources/CodeGenerationFactories/**/*.swift"]),
     deps = [
+        "@swift_syntax//:SwiftOperators",
         "@swift_syntax//:SwiftSyntax",
         "@swift_syntax//:SwiftSyntaxBuilder",
     ],
@@ -23,6 +24,33 @@ swift_binary(
         "@swift_syntax//:SwiftSyntax",
         "@swift_argument_parser//:ArgumentParser",
     ],
+)
+
+swift_compiler_plugin(
+    name = "SwiftMockGenMacro",
+    srcs = glob(["Sources/SwiftMockGenMacro/**/*.swift"]),
+    deps = [
+        ":CodeGenerationFactories",
+        "@swift_syntax//:SwiftSyntax",
+        "@swift_syntax//:SwiftCompilerPlugin",
+        "@swift_syntax//:SwiftSyntaxMacros",
+    ]
+)
+
+swift_test(
+    name = "SwiftMockGenMacroTests",
+    srcs = glob(["Tests/SwiftMockGenMacroTests/**/*.swift"]),
+    deps = [
+        ":SwiftMockGenMacro",
+        "@swift_syntax//:SwiftSyntaxMacrosTestSupport",
+    ]
+)
+
+swift_library(
+    name = "SwiftMockGen",
+    srcs = glob(["Sources/SwiftMockGen/**/*.swift"]),
+    plugins = [":SwiftMockGenMacro"],
+    visibility = ["//visibility:public"],
 )
 
 swift_library(
