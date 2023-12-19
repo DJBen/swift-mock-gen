@@ -1,5 +1,9 @@
 version: 1
 on:
+  cool:
+    job:
+      script: snapci/cool.sh
+      run_on: "mac_studio"
   comment:
     - body: "/deploy"
       jobs:
