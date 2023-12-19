@@ -15,16 +15,6 @@ def _maybe(repo_rule, name, **kwargs):
 def swift_mock_gen_dependencies():
     _maybe(
         http_archive,
-        name = "bazel_skylib",
-        urls = [
-            "https://github.com/bazelbuild/bazel-skylib/releases/download/1.3.0/bazel-skylib-1.3.0.tar.gz",
-            "https://mirror.bazel.build/github.com/bazelbuild/bazel-skylib/releases/download/1.3.0/bazel-skylib-1.3.0.tar.gz",
-        ],
-        sha256 = "74d544d96f4a5bb630d465ca8bbcfe231e3594e5aae57e1edbf17a6eb3ca2506",
-    )
-
-    _maybe(
-        http_archive,
         name = "swift_argument_parser",
         build_file = "@//:third_party/swift_argument_parser/BUILD.bazel.in",
         sha256 = "e5010ff37b542807346927ba68b7f06365a53cf49d36a6df13cef50d86018204",
