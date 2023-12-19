@@ -1,5 +1,4 @@
 """Definitions for handling dependencies used by swift-mock-gen."""
-
 load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
 
 def _maybe(repo_rule, name, **kwargs):
@@ -16,7 +15,7 @@ def swift_mock_gen_dependencies():
     _maybe(
         http_archive,
         name = "swift_argument_parser",
-        build_file = "@//:third_party/swift_argument_parser/BUILD.bazel.in",
+        build_file = "@smg//:third_party/swift_argument_parser/BUILD.bazel.in",
         sha256 = "e5010ff37b542807346927ba68b7f06365a53cf49d36a6df13cef50d86018204",
         strip_prefix = "swift-argument-parser-1.3.0",
         urls = [
