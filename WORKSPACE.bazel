@@ -20,29 +20,9 @@ load(
 
 swift_rules_extra_dependencies()
 
-http_archive(
-    name = "swift_argument_parser",
-    build_file = "@//:third_party/swift_argument_parser/BUILD.bazel.in",
-    sha256 = "e5010ff37b542807346927ba68b7f06365a53cf49d36a6df13cef50d86018204",
-    strip_prefix = "swift-argument-parser-1.3.0",
-    urls = [
-        "https://github.com/apple/swift-argument-parser/archive/refs/tags/1.3.0.tar.gz",
-    ],
+load(
+    "@//:deps.bzl",
+    "swift_mock_gen_dependencies",
 )
 
-http_archive(
-    name = "swift_syntax",
-    sha256 = "1a516cf344e4910329e3ba28e04f53f457bba23e71e7a4a980515ccc29685dbc",
-    strip_prefix = "swift-syntax-509.0.2",
-    urls = [
-        "https://github.com/apple/swift-syntax/archive/refs/tags/509.0.2.tar.gz",
-    ]
-)
-
-# load("@bazel_tools//tools/build_defs/repo:git.bzl", "git_repository")
-
-# git_repository(
-#     name = "swift_syntax",
-#     tag = "509.0.2",
-#     remote = "https://github.com/apple/swift-syntax.git",
-# )
+swift_mock_gen_dependencies()
