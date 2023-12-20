@@ -16,7 +16,6 @@ swift_binary(
     srcs = glob(["Sources/swift-mock-gen/**/*.swift"]),
     deps = [
         ":CodeGenerationFactories",
-        "@swift_syntax//:SwiftBasicFormat",
         "@swift_syntax//:SwiftDiagnostics",
         "@swift_syntax//:SwiftOperators",
         "@swift_syntax//:SwiftParser",
