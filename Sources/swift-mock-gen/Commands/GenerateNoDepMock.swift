@@ -4,7 +4,7 @@ import Foundation
 import SwiftParser
 import SwiftSyntax
 
-struct GenerateNoDepMock: ParsableCommand, ParseCommand {
+struct GenerateNoDepMock: ParsableCommand, ParseCommand, MockGenCommand {
     static var configuration = CommandConfiguration(
         commandName: "gen",
         abstract: "Generate mock for given protocols in the provided source files. The generated mock needs no dependencies."
@@ -12,6 +12,9 @@ struct GenerateNoDepMock: ParsableCommand, ParseCommand {
 
     @OptionGroup
     var arguments: ParseArguments
+
+    @OptionGroup
+    var mockGenArguments: MockGenArguments
 
     @Flag(
         name: .long,
@@ -42,8 +45,11 @@ struct GenerateNoDepMock: ParsableCommand, ParseCommand {
                     []
                 }
 
-                try tree.statements.forEach { codeBlockItemSyntax in
+                for codeBlockItemSyntax in tree.statements {
                     if let protocolDecl = codeBlockItemSyntax.item.as(ProtocolDeclSyntax.self) {
+                        if mockGenArguments.excludeProtocols.contains(protocolDecl.name.text) {
+                            continue
+                        }
                         let sourceFileSyntax = try SourceFileSyntax {
                             for decl in try NoDepSourceFactory().decls(
                                 protocolDecl: protocolDecl,
