@@ -11,10 +11,22 @@ swift_library(
     visibility = ["//visibility:public"],
 )
 
+swift_library(
+    name = "CLIUtils",
+    srcs = glob(["Sources/CLIUtils/**/*.swift"]),
+    deps = [
+        "@swift_syntax//:SwiftParser",
+        "@swift_syntax//:SwiftSyntax",
+        "@swift_syntax//:SwiftSyntaxBuilder",
+    ],
+    visibility = ["//visibility:public"],
+)
+
 swift_binary(
     name = "swift-mock-gen",
     srcs = glob(["Sources/swift-mock-gen/**/*.swift"]),
     deps = [
+        ":CLIUtils",
         ":CodeGenerationFactories",
         "@swift_syntax//:SwiftDiagnostics",
         "@swift_syntax//:SwiftOperators",
@@ -71,5 +83,15 @@ swift_test(
         ":CodeGenTesting",
         "@swift_syntax//:SwiftSyntax",
         "@swift_syntax//:SwiftSyntaxBuilder",
+    ],
+)
+
+swift_test(
+    name = "CLIUtilsTests",
+    srcs = glob(["Tests/CLIUtilsTests/**/*.swift"]),
+    deps = [
+        ":CLIUtils",
+        "@swift_syntax//:SwiftParser",
+        "@swift_syntax//:SwiftSyntax",
     ],
 )

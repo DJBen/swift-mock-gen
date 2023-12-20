@@ -29,8 +29,8 @@ class SwiftMockGen: ParsableCommand {
   static var configuration = CommandConfiguration(
     abstract: "Utility to generate Swift mock implementations given a protocol.",
     subcommands: [
-      GenerateMock.self,
-      GenerateNoDepMock.self,
+        GenerateNoDepMock.self,
+        GenerateMock.self,
     ]
   )
 }

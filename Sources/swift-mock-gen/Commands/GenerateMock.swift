@@ -1,4 +1,5 @@
 import ArgumentParser
+import CLIUtils
 import CodeGenerationFactories
 import SwiftParser
 import SwiftSyntax
@@ -6,7 +7,10 @@ import SwiftSyntax
 struct GenerateMock: ParsableCommand, ParseCommand, MockGenCommand {
     static var configuration = CommandConfiguration(
         commandName: "gen-alt",
-        abstract: "Generate mock for given protocols in the provided source files."
+        abstract: """
+        Generate mock for given protocols in the provided source files.
+        Note that this option is still in experimentation and may not compile.
+        """
     )
 
     @OptionGroup
@@ -32,7 +36,7 @@ struct GenerateMock: ParsableCommand, ParseCommand, MockGenCommand {
                             protocolDecl: protocolDecl,
                             surroundWithPoundIfDebug: surroundWithPoundIfDebug
                         )
-                        try write(mockClass.formatted(), fromSourceFile: sourceFile.fileName)
+                        try write(mockClass.formatted(), to: sourceFile.fileName)
                     }
                 }
             }
