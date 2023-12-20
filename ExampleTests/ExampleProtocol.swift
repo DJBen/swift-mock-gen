@@ -1,23 +1,15 @@
-public protocol ServiceProtocol {
-    var name: String {
-        get
-    }
-    var anyProtocol: any Codable {
-        get
-        set
-    }
-    var secondName: String? {
-        get
-    }
-    var added: () -> Void {
-        get
-        set
-    }
-    var removed: (() -> Void)? {
-        get
-        set
-    }
-    func initialize(name: String, secondName: String?, completion: @escaping (Error?) -> Void)
-    func fetchConfig() async throws -> [String: String]
-    func fetchData(_ name: (String, count: Int)) async -> (() -> Void)
+protocol P1: NSObjectProtocol, P2, P3 {
+    func p1()
+}
+
+protocol P2: P4, ExtraOnes {
+    func p2()
+}
+
+protocol P3 {
+    func p3()
+}
+
+protocol P4 {
+    func p4()
 }

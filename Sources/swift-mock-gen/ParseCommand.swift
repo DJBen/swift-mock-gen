@@ -11,6 +11,7 @@
 //===----------------------------------------------------------------------===//
 
 import ArgumentParser
+import CLIUtils
 import Foundation
 
 struct ParseArguments: ParsableArguments {
@@ -55,7 +56,7 @@ extension ParseCommand {
     /// - Parameters:
     ///   - output: The content of the output.
     ///   - fileName: The file name. If missing, it assumes "Mock.swift".
-    func write(_ content: any TextOutputStreamable, fromSourceFile fileName: String?) throws {
+    func write(_ content: any TextOutputStreamable, to fileName: String?) throws {
         if let outputDir = arguments.outputDir {
             // Ensure the output directory exists
             let outputDirURL = URL(fileURLWithPath: outputDir)
@@ -68,7 +69,7 @@ extension ParseCommand {
                 // Extract the file name from the path
                 let url = URL(fileURLWithPath: fileName)
                 let fileBaseName = url.deletingPathExtension().lastPathComponent
-                let fileExtension = url.pathExtension
+                let fileExtension = url.pathExtension.isEmpty ? "swift" : url.pathExtension
 
                 // Append -Mock to the file name
                 outputFileName = "\(fileBaseName)Mock.\(fileExtension)"
