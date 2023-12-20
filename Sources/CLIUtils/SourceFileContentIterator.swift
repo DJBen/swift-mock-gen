@@ -1,18 +1,24 @@
 import Foundation
 
-struct File {
+public struct File {
     /// If missing, it means the content comes from stdin.
-    let fileName: String?
-    let content: [UInt8]
+    public let fileName: String?
+    public let content: [UInt8]
+
+    public init(fileName: String? = nil, content: [UInt8]) {
+        self.fileName = fileName
+        self.content = content
+    }
 }
 
-struct SourceFileContentIterator: IteratorProtocol {
+/// An efficient file iterator that lazily iterates over files in directories.
+public struct SourceFileContentIterator: IteratorProtocol {
     private let fileNames: [String]
     private var directoryIterators: [IndexingIterator<[URL]>]
     private var currentDirectoryIndex = 0
     private var fileIndex = 0
 
-    init(sourcePaths: [String]) {
+    public init(sourcePaths: [String]) {
         var files = [String]()
         var directories = [String]()
 
@@ -31,8 +37,8 @@ struct SourceFileContentIterator: IteratorProtocol {
         self.init(fileNames: files, directories: directories)
     }
     
-    init(
-        fileNames: [String], 
+    public init(
+        fileNames: [String],
         directories: [String]
     ) {
         self.fileNames = fileNames
@@ -48,7 +54,7 @@ struct SourceFileContentIterator: IteratorProtocol {
         }
     }
 
-    mutating func next() -> File? {
+    public mutating func next() -> File? {
         // First try to get the next file from the fileNames array
         if fileIndex < fileNames.count {
             let fileName = fileNames[fileIndex]

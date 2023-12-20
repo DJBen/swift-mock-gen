@@ -40,6 +40,15 @@ let package = Package(
     ),
 
     .target(
+        name: "CLIUtils",
+        dependencies: [
+            .product(name: "SwiftParser", package: "swift-syntax"),
+            .product(name: "SwiftSyntax", package: "swift-syntax"),
+            .product(name: "SwiftSyntaxBuilder", package: "swift-syntax"),
+        ]
+    ),
+
+    .target(
       name: "CodeGenTesting",
       dependencies: [
         .product(name: "SwiftSyntaxMacrosTestSupport", package: "swift-syntax"),
@@ -79,9 +88,19 @@ let package = Package(
         path: "ExampleTests"
     ),
 
+    .testTarget(
+        name: "CLIUtilsTests",
+        dependencies: [
+            "CLIUtils",
+            .product(name: "SwiftParser", package: "swift-syntax"),
+            .product(name: "SwiftSyntax", package: "swift-syntax"),
+        ]
+    ),
+
     .executableTarget(
       name: "swift-mock-gen",
       dependencies: [
+        "CLIUtils",
         "CodeGenerationFactories",
         .product(name: "SwiftDiagnostics", package: "swift-syntax"),
         .product(name: "SwiftOperators", package: "swift-syntax"),

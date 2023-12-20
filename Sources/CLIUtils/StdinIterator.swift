@@ -1,12 +1,12 @@
 import Foundation
 
-struct StdinIterator: IteratorProtocol {
+public struct StdinIterator: IteratorProtocol {
     private var hasReadFromStdin = false
 
-    init() {
+    public init() {
     }
 
-    mutating func next() -> File? {
+    public mutating func next() -> File? {
         if hasReadFromStdin {
             return nil
         }
