@@ -16,15 +16,18 @@ struct GenerateMock: ParsableCommand, ParseCommand {
     var surroundWithPoundIfDebug: Bool = false
 
     func run() throws {
-        try sourceFileContents.withUnsafeBufferPointer { sourceBuffer in
-            let tree = Parser.parse(source: sourceBuffer)
-            try tree.statements.forEach { codeBlockItemSyntax in
-                if let protocolDecl = codeBlockItemSyntax.item.as(ProtocolDeclSyntax.self) {
-                    let mockClass = try SourceFactory().classDecl(
-                        protocolDecl: protocolDecl,
-                        surroundWithPoundIfDebug: surroundWithPoundIfDebug
-                    )
-                    print(mockClass.formatted())
+        var sourceFiles = sourceFiles()
+        while let sourceFile = sourceFiles.next() {
+            try sourceFile.content.withUnsafeBufferPointer { sourceBuffer in
+                let tree = Parser.parse(source: sourceBuffer)
+                try tree.statements.forEach { codeBlockItemSyntax in
+                    if let protocolDecl = codeBlockItemSyntax.item.as(ProtocolDeclSyntax.self) {
+                        let mockClass = try SourceFactory().classDecl(
+                            protocolDecl: protocolDecl,
+                            surroundWithPoundIfDebug: surroundWithPoundIfDebug
+                        )
+                        try write(mockClass.formatted(), fromSourceFile: sourceFile.fileName)
+                    }
                 }
             }
         }
