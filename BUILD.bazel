@@ -35,6 +35,7 @@ swift_binary(
         "@swift_syntax//:SwiftSyntax",
         "@swift_argument_parser//:ArgumentParser",
     ],
+    visibility = ["//visibility:public"],
 )
 
 swift_compiler_plugin(
