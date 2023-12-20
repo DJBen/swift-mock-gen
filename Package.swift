@@ -83,7 +83,6 @@ let package = Package(
       name: "swift-mock-gen",
       dependencies: [
         "CodeGenerationFactories",
-        .product(name: "SwiftBasicFormat", package: "swift-syntax"),
         .product(name: "SwiftDiagnostics", package: "swift-syntax"),
         .product(name: "SwiftOperators", package: "swift-syntax"),
         .product(name: "SwiftParser", package: "swift-syntax"),
