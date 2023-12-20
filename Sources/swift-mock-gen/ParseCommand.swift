@@ -15,14 +15,19 @@ import Foundation
 
 struct ParseArguments: ParsableArguments {
     @Argument(
-        help: "The source files and/or directories that should be parsed; if omitted, use stdin"
+        help: "The source files and/or directories that should be parsed; if omitted, use stdin",
+        completion: .file()
     )
     var sourcePaths: [String]
 
     @Option(name: [.long], help: "If passed, parse this source text instead of reading source file")
     var source: String?
 
-    @Option(name: [.long, .short], help: "Writes generated mocks to the output directory, if provided.")
+    @Option(
+        name: [.long, .short],
+        help: "Writes generated mocks to the output directory, if provided.",
+        completion: .directory
+    )
     var outputDir: String?
 }
 
