@@ -45,7 +45,8 @@ extension ParseCommand {
         } else if arguments.sourcePaths.isEmpty {
             return StdinIterator()
         } else {
-            return SourceFileContentIterator(sourcePaths: arguments.sourcePaths)
+            let dedupedSourcePaths = Set(arguments.sourcePaths)
+            return SourceFileContentIterator(sourcePaths: dedupedSourcePaths)
         }
     }
     
