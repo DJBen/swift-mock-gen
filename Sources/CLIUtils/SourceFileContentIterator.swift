@@ -18,7 +18,7 @@ public struct SourceFileContentIterator: IteratorProtocol {
     private var currentDirectoryIndex = 0
     private var fileIndex = 0
 
-    public init(sourcePaths: [String]) {
+    public init(sourcePaths: any Sequence<String>) {
         var files = [String]()
         var directories = [String]()
 

@@ -81,14 +81,6 @@ let package = Package(
     ),
 
     .testTarget(
-        name: "ExampleMockTests",
-        dependencies: [
-            "MockSupport",
-        ],
-        path: "ExampleTests"
-    ),
-
-    .testTarget(
         name: "CLIUtilsTests",
         dependencies: [
             "CLIUtils",

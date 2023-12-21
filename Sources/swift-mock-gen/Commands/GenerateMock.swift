@@ -36,7 +36,9 @@ struct GenerateMock: ParsableCommand, ParseCommand, MockGenCommand {
                             protocolDecl: protocolDecl,
                             surroundWithPoundIfDebug: surroundWithPoundIfDebug
                         )
-                        try write(mockClass.formatted(), to: sourceFile.fileName)
+                        try withFileHandler(sourceFile.fileName) { sink in
+                            try sink.stream(mockClass.formatted())
+                        }
                     }
                 }
             }
