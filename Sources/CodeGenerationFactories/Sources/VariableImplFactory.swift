@@ -23,7 +23,13 @@ public struct VariableImplFactory {
                  }
                  */
                 VariableDeclSyntax(
-                    attributes: [],
+                    attributes: {
+                        if protocolDecl.isNSObjectProtocol {
+                            return "@objc"
+                        } else {
+                            return []
+                        }
+                    }(),
                     modifiers: DeclModifierListSyntax {
                         // Append scope modifier to the function (public, internal, ...)
                         if let scopeModifier = protocolDecl.modifiers.scopeModifier {
