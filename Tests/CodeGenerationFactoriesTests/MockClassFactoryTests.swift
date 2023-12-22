@@ -131,10 +131,6 @@ final class MockClassFactoryTests: XCTestCase {
                         getCount_name += 1
                         return underlying_name
                     }
-                    set {
-                        setCount_name += 1
-                        underlying_name = newValue
-                    }
                 }
                 var underlying_name: String!
                 private (set) var getCount_name: Int = 0
@@ -158,10 +154,6 @@ final class MockClassFactoryTests: XCTestCase {
                     get {
                         getCount_secondName += 1
                         return underlying_secondName
-                    }
-                    set {
-                        setCount_secondName += 1
-                        underlying_secondName = newValue
                     }
                 }
                 var underlying_secondName: String!
