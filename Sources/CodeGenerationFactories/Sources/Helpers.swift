@@ -25,27 +25,27 @@ extension ProtocolDeclSyntax {
 extension DeclModifierListSyntax {
     var scopeModifier: DeclModifierSyntax? {
         first(where: {
-            $0.name.kind == TokenSyntax.keyword(.public).kind ||
-            $0.name.kind == TokenSyntax.keyword(.private).kind ||
-            $0.name.kind == TokenSyntax.keyword(.fileprivate).kind ||
-            $0.name.kind == TokenSyntax.keyword(.internal).kind ||
-            $0.name.kind == TokenSyntax.keyword(.open).kind
+            $0.name.text == TokenSyntax.keyword(.public).text ||
+            $0.name.text == TokenSyntax.keyword(.private).text ||
+            $0.name.text == TokenSyntax.keyword(.fileprivate).text ||
+            $0.name.text == TokenSyntax.keyword(.internal).text ||
+            $0.name.text == TokenSyntax.keyword(.open).text
         })
     }
 
     var isPublic: Bool {
         contains(where: {
-            $0.name.kind == TokenSyntax.keyword(.public).kind
+            $0.name.text == TokenSyntax.keyword(.public).text
         })
     }
 
     mutating func clearScopeModifier() {
         self = filter {
-            $0.name.kind != TokenSyntax.keyword(.public).kind ||
-            $0.name.kind != TokenSyntax.keyword(.private).kind ||
-            $0.name.kind != TokenSyntax.keyword(.fileprivate).kind ||
-            $0.name.kind != TokenSyntax.keyword(.internal).kind ||
-            $0.name.kind != TokenSyntax.keyword(.open).kind
+            $0.name.text != TokenSyntax.keyword(.public).text ||
+            $0.name.text != TokenSyntax.keyword(.private).text ||
+            $0.name.text != TokenSyntax.keyword(.fileprivate).text ||
+            $0.name.text != TokenSyntax.keyword(.internal).text ||
+            $0.name.text != TokenSyntax.keyword(.open).text
         }
     }
 }
@@ -54,8 +54,8 @@ extension AccessorBlockSyntax {
     var protocolVarIsGetSet: Bool {
         switch accessors {
         case .accessors(let accessorDecl):
-            return accessorDecl.contains(where: { $0.accessorSpecifier.kind == TokenSyntax.keyword(.get).kind }) &&
-            accessorDecl.contains(where: { $0.accessorSpecifier.kind == TokenSyntax.keyword(.set).kind })
+            return accessorDecl.contains(where: { $0.accessorSpecifier.text == TokenSyntax.keyword(.get).text }) &&
+            accessorDecl.contains(where: { $0.accessorSpecifier.text == TokenSyntax.keyword(.set).text })
         case .getter(_):
             // A protocol cannot have a getter impl syntax.
             return false
