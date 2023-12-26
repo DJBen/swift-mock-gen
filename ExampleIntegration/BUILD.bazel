@@ -1,0 +1,17 @@
+load("@build_bazel_rules_swift//swift:swift.bzl", "swift_library", "swift_test")
+
+swift_library(
+    name = "ExampleIntegration",
+    srcs = glob(["Sources/ExampleIntegration/**/*.swift"]),
+    deps = [
+    ],
+    visibility = ["//visibility:public"],
+)
+
+swift_test(
+    name = "ExampleIntegrationTests",
+    srcs = glob(["Tests/ExampleIntegrationTests/**/*.swift"]),
+    deps = [
+        ":ExampleIntegration",
+    ],
+)
