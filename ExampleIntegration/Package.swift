@@ -6,14 +6,18 @@ let package = Package(
     name: "ExampleIntegration",
     products: [
         .library(
-            name: "ExampleIntegration",
-            targets: ["ExampleIntegration"]),
+            name: "Example",
+            targets: ["Example"]),
+        .library(
+            name: "ExampleImpl",
+            targets: ["Example"]),
     ],
     targets: [
         .target(
-            name: "ExampleIntegration"),
+            name: "Example"),
+        .target(name: "ExampleImpl"),
         .testTarget(
-            name: "ExampleIntegrationTests",
-            dependencies: ["ExampleIntegration"]),
+            name: "ExampleImplTests",
+            dependencies: ["Example", "ExampleImpl"]),
     ]
 )
