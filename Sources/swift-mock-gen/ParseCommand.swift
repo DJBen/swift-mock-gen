@@ -86,9 +86,20 @@ extension ParseCommand {
         }
 
         // Ensure the output directory exists
-        let outputDirURL = URL(fileURLWithPath: outputDir)
+        let fileNamePath = {
+            if let fileName = fileName {
+                (fileName as NSString).deletingLastPathComponent
+            } else {
+                ""
+            }
+        }()
+        let outputDirURL = URL(fileURLWithPath: outputDir).appending(path: fileNamePath)
         if !FileManager.default.fileExists(atPath: outputDirURL.path) {
-            try FileManager.default.createDirectory(at: outputDirURL, withIntermediateDirectories: true, attributes: nil)
+            try FileManager.default.createDirectory(
+                at: outputDirURL,
+                withIntermediateDirectories: true,
+                attributes: nil
+            )
         }
 
         let outputFileName: String
@@ -105,7 +116,13 @@ extension ParseCommand {
             outputFileName = "Mock.swift"
         }
 
-        let outputUrl = URL(fileURLWithPath: outputDir).appendingPathComponent(outputFileName)
+        let outputUrl = URL(
+            fileURLWithPath: outputDir
+        )
+        .appending(
+            path: fileNamePath
+        )
+        .appendingPathComponent(outputFileName)
 
         if !FileManager.default.fileExists(atPath: outputUrl.path) {
             FileManager.default.createFile(atPath: outputUrl.path, contents: nil, attributes: nil)
@@ -114,6 +131,8 @@ extension ParseCommand {
         let fileHandle = try FileHandle(forWritingTo: outputUrl)
 
         try writeBlock(FileStreamSink(stream: FileHandlerOutputStream(fileHandle)))
+
+        print("Writing generated mock \(outputUrl)")
 
         fileHandle.closeFile()
     }
