@@ -6,7 +6,7 @@ import CompilerPluginSupport
 let package = Package(
   name: "SwiftMockGen",
   platforms: [
-    .macOS(.v10_15),
+    .macOS(.v13),
     .iOS(.v13),
   ],
   products: [
@@ -78,14 +78,6 @@ let package = Package(
             "CodeGenerationFactories",
             .product(name: "SwiftSyntaxMacrosTestSupport", package: "swift-syntax"),
         ]
-    ),
-
-    .testTarget(
-        name: "ExampleMockTests",
-        dependencies: [
-            "MockSupport",
-        ],
-        path: "ExampleTests"
     ),
 
     .testTarget(

@@ -14,7 +14,7 @@ struct MockGenArguments: ParsableArguments {
         help: """
         Support mocks of protocols with conformance to another protocol to be
         generated correcly, as long as the dependent protocol is included.
-        Enabling this option may use more memory.
+        Enabling this option may consume more memory.
         """
     )
     var transitiveProtocolConformance: Bool = true
