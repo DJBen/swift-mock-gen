@@ -24,13 +24,24 @@ jobs:
     - name: Test with Swift
       run: swift test
 
-    - name: Install Bazel
+    - name: Install Bazelisk and Set Up Bazel
       run: |
-        # Install Bazelisk, a Bazel version manager
-        brew install bazelisk
-        # Use 'bazel' command to refer to 'bazelisk'
-        ln -s /usr/local/bin/bazelisk /usr/local/bin/bazel
+        # Check if Bazelisk is already installed
+        if ! brew list bazelisk &>/dev/null; then
+          echo "Installing Bazelisk..."
+          brew install bazelisk
+        else
+          echo "Bazelisk is already installed."
+        fi
 
+        # Check if the symbolic link for 'bazel' already exists
+        if [ ! -L /usr/local/bin/bazel ]; then
+          echo "Creating symbolic link for Bazel..."
+          ln -s /usr/local/bin/bazelisk /usr/local/bin/bazel
+        else
+          echo "Symbolic link for Bazel already exists."
+        fi
+      shell: /bin/bash -e {0}
     - name: Build and test with Bazel
       run: |
         bazel build :all
