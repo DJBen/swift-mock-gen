@@ -1,5 +1,6 @@
 import Foundation
 import SwiftSyntax
+import SwiftSyntaxBuilder
 import SwiftParser
 
 public struct ProtocolDeclResult: Equatable {
@@ -33,24 +34,28 @@ public struct ProtocolDepResolver {
     }
 
     public func inheritanceMergedProtocolDecls(
-        copyImports: Bool
+        copyImports: Bool,
+        additionalImports: [String] = []
     ) throws -> [ProtocolDeclResult] {
         var fileIterator = fileIteratorProvider()
         var protocols = [String: ProtocolDeclResult]()
         var protocolDeps = [ProtocolDeps]()
 
         while let sourceFile = fileIterator.next() {
-            sourceFile.content.withUnsafeBufferPointer { sourceBuffer in
+            try sourceFile.content.withUnsafeBufferPointer { sourceBuffer in
                 let tree = Parser.parse(source: sourceBuffer)
-                let imports: [ImportDeclSyntax] = if copyImports {
-                    tree.statements.map { codeBlockItemSyntax in
+                var imports: [ImportDeclSyntax] = []
+
+                if copyImports {
+                    for codeBlockItemSyntax in tree.statements {
                         if let importDecl = codeBlockItemSyntax.item.as(ImportDeclSyntax.self) {
-                            return [importDecl]
+                            imports.append(importDecl)
                         }
-                        return []
-                    }.reduce([], +)
-                } else {
-                    []
+                    }
+                }
+
+                for additionalImport in additionalImports {
+                    imports.append(try ImportDeclSyntax("import \(raw: additionalImport)"))
                 }
 
                 for codeBlockItemSyntax in tree.statements {
