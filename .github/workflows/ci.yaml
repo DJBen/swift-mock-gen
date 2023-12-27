@@ -18,8 +18,26 @@ jobs:
       with:
         xcode-version: '15.1'
 
-    - name: Build
+    - name: Build with Swift
       run: swift build
 
-    - name: Test
+    - name: Test with Swift
       run: swift test
+
+    - name: Install Bazel
+      run: |
+        # Install Bazelisk, a Bazel version manager
+        brew install bazelisk
+        # Use 'bazel' command to refer to 'bazelisk'
+        ln -s /usr/local/bin/bazelisk /usr/local/bin/bazel
+
+    - name: Build and test with Bazel
+      run: |
+        bazel build :all
+        bazel test :all
+
+    - name: Build and test ExampleIntegration
+      run: |
+        cd ExampleIntegration
+        bazel build :all
+        bazel test :all
