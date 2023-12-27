@@ -6,7 +6,7 @@ import CompilerPluginSupport
 let package = Package(
   name: "SwiftMockGen",
   platforms: [
-    .macOS(.v10_15),
+    .macOS(.v13),
     .iOS(.v13),
   ],
   products: [
