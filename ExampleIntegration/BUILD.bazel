@@ -1,4 +1,5 @@
 load("@build_bazel_rules_swift//swift:swift.bzl", "swift_library", "swift_test")
+load("@swift_mock_gen//:generate_swift_mock.bzl", "generate_swift_mock")
 
 swift_library(
     name = "Example",
@@ -24,4 +25,9 @@ swift_test(
         ":Example",
         ":ExampleImpl",
     ],
+)
+
+generate_swift_mock(
+    name = "generate_swift_mock",
+    srcs = glob(["Sources/Example/**/*.swift"]),
 )

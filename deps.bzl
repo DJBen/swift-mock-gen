@@ -12,18 +12,15 @@ def _maybe(repo_rule, name, **kwargs):
     if not native.existing_rule(name):
         repo_rule(name = name, **kwargs)
 
-def swift_mock_gen_dependencies(repo_name = ""):
+def swift_mock_gen_dependencies(workspace_name = "@swift_mock_gen"):
     """
     Install the dependencies of swift_mock_gen.
-
-    Args:
-        repo_name: If referenced outside of this repo, this is the name of this repo assigned with @.
     """
 
     _maybe(
         http_archive,
         name = "swift_argument_parser",
-        build_file = repo_name + "//:third_party/swift_argument_parser/BUILD.bazel.in",
+        build_file = workspace_name + "//:third_party/swift_argument_parser/BUILD.bazel.in",
         sha256 = "e5010ff37b542807346927ba68b7f06365a53cf49d36a6df13cef50d86018204",
         strip_prefix = "swift-argument-parser-1.3.0",
         urls = [
