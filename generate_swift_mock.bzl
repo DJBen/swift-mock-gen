@@ -35,8 +35,6 @@ def _generate_swift_mock_impl(ctx):
 
     args += ["-o", ctx.genfiles_dir.path + "/" + output_dir]
 
-    print(args)
-
     ctx.actions.run(
         outputs=outputs,
         inputs=ctx.files.srcs,
