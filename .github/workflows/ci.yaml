@@ -44,8 +44,8 @@ jobs:
       shell: /bin/bash -e {0}
     - name: Build and test with Bazel
       run: |
-        bazel build :all
-        bazel test :all
+        bazel build :swift-mock-gen
+        bazel test :CodeGenTesting :CodeGenerationFactoriesTests :CLIUtilsTests
 
     - name: Build and test ExampleIntegration
       run: |
