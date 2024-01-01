@@ -104,3 +104,19 @@ def generate_swift_mock_module(
         module_name = plain_target_name + "Mock",
         visibility = ["//visibility:public"],
     )
+
+def swift_mock_gen_config(
+    exclude_protocols = [],
+):
+    """
+    A config that controls swift mock gen behavior.
+
+    Args:
+        exclude_protocols (list): A list of protocol names to be excluded from the
+                                  Swift mock generation process. This parameter allows
+                                  selective exclusion of certain protocols from being
+                                  mocked. If left empty, no protocols are excluded.
+    """
+    return struct(
+        exclude_protocols = exclude_protocols,
+    )
