@@ -5,7 +5,10 @@ public struct File {
     public let fileName: String?
     public let content: [UInt8]
 
-    public init(fileName: String? = nil, content: [UInt8]) {
+    public init(
+        fileName: String? = nil,
+        content: [UInt8]
+    ) {
         self.fileName = fileName
         self.content = content
     }
