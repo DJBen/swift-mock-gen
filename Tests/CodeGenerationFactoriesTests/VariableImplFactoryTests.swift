@@ -65,16 +65,16 @@ final class VariableImplFactoryTests: XCTestCase {
         )
     }
 
-    func testGeneration_objcProtocol() throws {
+    func testGeneration_objcProtocol_objcVariableShouldAnnotateWithAtObjc() throws {
         let result = try MemberBlockItemListSyntax {
             for member in try VariableImplFactory().decls(
                 protocolDecl: try! ProtocolDeclSyntax(#"""
                 public protocol ObjcProtocol: NSObjectProtocol {
-                    @objc var param: Int { get }
+                    @objc var param: NSNumber { get }
                 }
                 """#),
                 protocolVariableDecl: try! VariableDeclSyntax(#"""
-                @objc var param: Int { get }
+                @objc var param: NSNumber { get }
                 """#)
             ) {
                 MemberBlockItemSyntax(decl: member)
@@ -86,7 +86,41 @@ final class VariableImplFactoryTests: XCTestCase {
             ##"""
 
 
-            @objc public var param: Int {
+            @objc public var param: NSNumber {
+                get {
+                    getCount_param += 1
+                    return underlying_param
+                }
+            }
+            var underlying_param: NSNumber!
+            private (set) var getCount_param: Int = 0
+            private (set) var setCount_param: Int = 0
+            """##
+        )
+    }
+
+    func testGeneration_objcProtocol_nonObjcVariableShouldNotAnnotateWithAtObjc() throws {
+        let result = try MemberBlockItemListSyntax {
+            for member in try VariableImplFactory().decls(
+                protocolDecl: try! ProtocolDeclSyntax(#"""
+                public protocol ObjcProtocol: NSObjectProtocol {
+                    var param: Int { get }
+                }
+                """#),
+                protocolVariableDecl: try! VariableDeclSyntax(#"""
+                var param: Int { get }
+                """#)
+            ) {
+                MemberBlockItemSyntax(decl: member)
+            }
+        }
+
+        assertBuildResult(
+            result,
+            ##"""
+
+
+            public var param: Int {
                 get {
                     getCount_param += 1
                     return underlying_param
@@ -95,6 +129,80 @@ final class VariableImplFactoryTests: XCTestCase {
             var underlying_param: Int!
             private (set) var getCount_param: Int = 0
             private (set) var setCount_param: Int = 0
+            """##
+        )
+    }
+
+    func testGeneration_weakVar_shouldSythesizeOptionalVariable() throws {
+        let result = try MemberBlockItemListSyntax {
+            for member in try VariableImplFactory().decls(
+                protocolDecl: try! ProtocolDeclSyntax(#"""
+                @objc public protocol SomeProtocol {
+                    weak var delegate: SomeDelegate? { get set }
+                }
+                """#),
+                protocolVariableDecl: try! VariableDeclSyntax(#"""
+                weak var delegate: SomeDelegate? { get set }
+                """#)
+            ) {
+                MemberBlockItemSyntax(decl: member)
+            }
+        }
+
+        assertBuildResult(
+            result,
+            ##"""
+
+
+            public var delegate: SomeDelegate? {
+                get {
+                    getCount_delegate += 1
+                    return underlying_delegate
+                }
+                set {
+                    setCount_delegate += 1
+                    underlying_delegate = newValue
+                }
+            }
+            var underlying_delegate: SomeDelegate!
+            private (set) var getCount_delegate: Int = 0
+            private (set) var setCount_delegate: Int = 0
+            """##
+        )
+
+        let result2 = try MemberBlockItemListSyntax {
+            for member in try VariableImplFactory().decls(
+                protocolDecl: try! ProtocolDeclSyntax(#"""
+                @objc public protocol SomeProtocol {
+                    weak var delegate: (Delegate1 & Delegate2 & Delegate3)? { get set }
+                }
+                """#),
+                protocolVariableDecl: try! VariableDeclSyntax(#"""
+                weak var delegate: (Delegate1 & Delegate2 & Delegate3)? { get set }
+                """#)
+            ) {
+                MemberBlockItemSyntax(decl: member)
+            }
+        }
+
+        assertBuildResult(
+            result2,
+            ##"""
+
+
+            public var delegate: (Delegate1 & Delegate2 & Delegate3)? {
+                get {
+                    getCount_delegate += 1
+                    return underlying_delegate
+                }
+                set {
+                    setCount_delegate += 1
+                    underlying_delegate = newValue
+                }
+            }
+            var underlying_delegate: (Delegate1 & Delegate2 & Delegate3)!
+            private (set) var getCount_delegate: Int = 0
+            private (set) var setCount_delegate: Int = 0
             """##
         )
     }

@@ -24,7 +24,7 @@ public struct VariableImplFactory {
                  */
                 VariableDeclSyntax(
                     attributes: {
-                        if protocolDecl.isNSObjectProtocol {
+                        if protocolVariableDecl.hasAtObjcAttribute {
                             return "@objc"
                         } else {
                             return []
@@ -68,7 +68,7 @@ public struct VariableImplFactory {
                 // public var underlying_id: String!
                 VariableDeclSyntax(
                     attributes: [],
-                    modifiers: protocolVariableDecl.modifiers.removingSetterModifier().trimmed,
+                    modifiers: protocolVariableDecl.modifiers.removingSetterModifier().removingWeakModifier().trimmed,
                     bindingSpecifier: .keyword(.var),
                     bindingsBuilder: {
                         PatternBindingSyntax(
@@ -84,7 +84,7 @@ public struct VariableImplFactory {
                 VariableDeclSyntax(
                     attributes: [],
                     modifiers: {
-                        var getSetCountModifiers = protocolVariableDecl.modifiers.removingSetterModifier().trimmed
+                        var getSetCountModifiers = protocolVariableDecl.modifiers.removingSetterModifier().removingWeakModifier().trimmed
 
                         getSetCountModifiers.append(
                             DeclModifierSyntax(
@@ -109,7 +109,7 @@ public struct VariableImplFactory {
                 VariableDeclSyntax(
                     attributes: [],
                     modifiers: {
-                        var getSetCountModifiers = protocolVariableDecl.modifiers.removingSetterModifier().trimmed
+                        var getSetCountModifiers = protocolVariableDecl.modifiers.removingSetterModifier().removingWeakModifier().trimmed
 
                         getSetCountModifiers.append(
                             DeclModifierSyntax(
@@ -132,49 +132,6 @@ public struct VariableImplFactory {
             ]
         } else {
             return []
-        }
-    }
-}
-
-extension DeclModifierListSyntax {
-    /// Given a modifier list, removing the scope modifier that is specific to "set".
-    /// e.g public private(set) becomes public.
-    /// - Returns: A modifier list after modifier specific to 'set' is removed.
-    func removingSetterModifier() -> DeclModifierListSyntax {
-        filter({
-            $0.detail?.detail.text != "set"
-        })
-    }
-}
-
-extension TypeSyntax {
-    func toImplicitOptional() -> ImplicitlyUnwrappedOptionalTypeSyntax {
-        if let optional = self.as(OptionalTypeSyntax.self) {
-            return ImplicitlyUnwrappedOptionalTypeSyntax(wrappedType: optional.wrappedType)
-        } else if let function = self.as(FunctionTypeSyntax.self) {
-            // Need to wrap function with parens
-            return ImplicitlyUnwrappedOptionalTypeSyntax(
-                wrappedType: TupleTypeSyntax(
-                    elements: TupleTypeElementListSyntax(
-                        itemsBuilder: {
-                            TupleTypeElementSyntax(type: function)
-                        }
-                    )
-                )
-            )
-        } else if let someOrAny = self.as(SomeOrAnyTypeSyntax.self) {
-            // Wrap some X or any X types with parens
-            return ImplicitlyUnwrappedOptionalTypeSyntax(
-                wrappedType: TupleTypeSyntax(
-                    elements: TupleTypeElementListSyntax(
-                        itemsBuilder: {
-                            TupleTypeElementSyntax(type: someOrAny)
-                        }
-                    )
-                )
-            )
-        } else {
-            return ImplicitlyUnwrappedOptionalTypeSyntax(wrappedType: self)
         }
     }
 }

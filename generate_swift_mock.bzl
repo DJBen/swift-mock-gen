@@ -107,6 +107,7 @@ def generate_swift_mock_module(
 
 def swift_mock_gen_config(
     exclude_protocols = [],
+    verbose = False,
 ):
     """
     A config that controls swift mock gen behavior.
@@ -116,7 +117,9 @@ def swift_mock_gen_config(
                                   Swift mock generation process. This parameter allows
                                   selective exclusion of certain protocols from being
                                   mocked. If left empty, no protocols are excluded.
+        verbose (bool): A flag to toggle verbose outputs.
     """
     return struct(
         exclude_protocols = exclude_protocols,
+        verbose = verbose,
     )
