@@ -93,7 +93,7 @@ extension ParseCommand {
 
         let outputFileName: String
         if let fileName = fileName {
-            // Extract the file name from the path
+            // This file name is a relative path that gets passed in.
             let url = URL(fileURLWithPath: fileName)
             let fileBaseName = url.deletingPathExtension().lastPathComponent
             let fileExtension = url.pathExtension.isEmpty ? "swift" : url.pathExtension
@@ -106,6 +106,8 @@ extension ParseCommand {
         }
 
         let outputUrl = URL(fileURLWithPath: outputDir).appendingPathComponent(outputFileName)
+
+        print("swift-mock-gen: writing to \(outputUrl)")
 
         if !FileManager.default.fileExists(atPath: outputUrl.path) {
             FileManager.default.createFile(atPath: outputUrl.path, contents: nil, attributes: nil)

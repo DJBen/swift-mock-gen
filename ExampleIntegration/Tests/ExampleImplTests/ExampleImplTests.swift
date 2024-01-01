@@ -1,5 +1,6 @@
 import XCTest
 import Example
+import ExampleMock
 @testable import ExampleImpl
 
 // ExampleMock is a generated target consisting of all the mock impls of the protocols from the `Example` target.

@@ -1,5 +1,3 @@
-workspace(name = "swift_mock_gen")
-
 load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
 
 http_archive(
@@ -26,8 +24,13 @@ load("@bazel_skylib//:workspace.bzl", "bazel_skylib_workspace")
 
 bazel_skylib_workspace()
 
+local_repository(
+    name = "swift_mock_gen",
+    path = "../",
+)
+
 load(
-    "//:deps.bzl",
+    "@swift_mock_gen//:deps.bzl",
     "swift_mock_gen_dependencies",
 )
 

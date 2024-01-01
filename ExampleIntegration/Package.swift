@@ -10,14 +10,18 @@ let package = Package(
             targets: ["Example"]),
         .library(
             name: "ExampleImpl",
-            targets: ["Example"]),
+            targets: ["ExampleImpl"]),
     ],
     targets: [
         .target(
-            name: "Example"),
-        .target(name: "ExampleImpl"),
+            name: "Example"
+        ),
+        .target(
+            name: "ExampleImpl"
+        ),
         .testTarget(
             name: "ExampleImplTests",
-            dependencies: ["Example", "ExampleImpl"]),
+            dependencies: ["Example", "ExampleImpl"]
+        ),
     ]
 )

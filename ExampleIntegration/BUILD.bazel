@@ -22,6 +22,7 @@ generate_swift_mock_module(
     name = "generate_swift_mock_module",
     srcs = glob(["Sources/Example/**/*.swift"]),
     api_module = ":Example",
+    exclude_protocols = [],
 )
 
 swift_test(

@@ -2,6 +2,19 @@
 Bazel rule to generate mock impls of the protocols from provided source swift files.
 """
 load("@build_bazel_rules_swift//swift:swift.bzl", "swift_library")
+load("@bazel_skylib//lib:paths.bzl", "paths")
+
+def _extract_target_name(label):
+    # Extract the target name from a Bazel label
+    if label.startswith("//"):
+        # Full label, split by ':'
+        return label.split(":")[-1]
+    elif label.startswith(":"):
+        # Relative label, remove the leading ':'
+        return label[1:]
+    else:
+        # Default case, return the label as is
+        return label
 
 def _generate_swift_mock_impl(ctx):
     # Executable
@@ -23,17 +36,16 @@ def _generate_swift_mock_impl(ctx):
 
     outputs = []
 
-    output_dir = ctx.label.name + "/Mocks/"
     for src_file in ctx.files.srcs:
         # Output file for each source file
         base_name = src_file.basename
         if base_name.endswith(".swift"):
             base_name = base_name[:-6]  # Remove '.swift' extension
 
-        output_file_path = output_dir + src_file.dirname + "/" + base_name + "Mock.swift"
+        output_file_path = paths.join(base_name + "Mock.swift")
         outputs.append(ctx.actions.declare_file(output_file_path))
 
-    args += ["-o", ctx.genfiles_dir.path + "/" + output_dir]
+    args += ["-o", paths.join(ctx.genfiles_dir.path, ctx.label.package)]
 
     ctx.actions.run(
         outputs=outputs,
@@ -63,18 +75,6 @@ generate_swift_mock = rule(
         ),
     },
 )
-
-def _extract_target_name(label):
-    # Extract the target name from a Bazel label
-    if label.startswith("//"):
-        # Full label, split by ':'
-        return label.split(":")[-1]
-    elif label.startswith(":"):
-        # Relative label, remove the leading ':'
-        return label[1:]
-    else:
-        # Default case, return the label as is
-        return label
 
 def generate_swift_mock_module(
     name,

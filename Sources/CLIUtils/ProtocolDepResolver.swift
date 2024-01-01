@@ -32,16 +32,24 @@ public struct ProtocolDepResolver {
     public init(fileIteratorProvider: @escaping () -> any IteratorProtocol<File>) {
         self.fileIteratorProvider = fileIteratorProvider
     }
-
+    
+    /// Return a list of ``ProtocolDeclResult``s. Their protocl decl syntaxes are merged from their
+    /// parent's, if any are inherited from parents.
+    /// - Parameters:
+    ///   - copyImports: Whether to copy the imports.
+    ///   - additionalImports: Any additional modules to be imported.
+    /// - Returns: A tuple consisting of processed results, and a list of empty files.
     public func inheritanceMergedProtocolDecls(
         copyImports: Bool,
         additionalImports: [String] = []
-    ) throws -> [ProtocolDeclResult] {
+    ) throws -> ([ProtocolDeclResult], [String]) {
         var fileIterator = fileIteratorProvider()
         var protocols = [String: ProtocolDeclResult]()
         var protocolDeps = [ProtocolDeps]()
+        var emptyFiles = [String]()
 
         while let sourceFile = fileIterator.next() {
+            var isSourceFileEmpty = true
             try sourceFile.content.withUnsafeBufferPointer { sourceBuffer in
                 let tree = Parser.parse(source: sourceBuffer)
                 var imports: [ImportDeclSyntax] = []
@@ -68,7 +76,12 @@ public struct ProtocolDepResolver {
                         protocolDeps.append(
                             ProtocolDeps(name: protocolDecl.name.text, deps: protocolDecl.conformedNonNSObjectProtocols)
                         )
+                        isSourceFileEmpty = false
                     }
+                }
+
+                if isSourceFileEmpty, let fileName = sourceFile.fileName {
+                    emptyFiles.append(fileName)
                 }
             }
         }
@@ -78,7 +91,7 @@ public struct ProtocolDepResolver {
             protocolDeps[index].deps = protocolDeps[index].deps.filter { protocols[$0] != nil }
         }
 
-        return try mergeProtocols(
+        let mergedResults = try mergeProtocols(
             protocolDeps,
             protocols: &protocols
         )
@@ -90,6 +103,8 @@ public struct ProtocolDepResolver {
                 }
             }
         )
+
+        return (mergedResults, emptyFiles)
     }
 
     func mergeProtocols(_ deps: [ProtocolDeps], protocols: inout [String: ProtocolDeclResult]) throws -> [ProtocolDeps] {
