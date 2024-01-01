@@ -30,6 +30,12 @@ struct ParseArguments: ParsableArguments {
         completion: .directory
     )
     var outputDir: String?
+
+    @Flag(
+        name: [.short],
+        help: "Enables verbose debug outputs"
+    )
+    var verbose: Bool = false
 }
 
 /// A command  that has arguments to parse source code
@@ -107,7 +113,9 @@ extension ParseCommand {
 
         let outputUrl = URL(fileURLWithPath: outputDir).appendingPathComponent(outputFileName)
 
-        print("swift-mock-gen: writing to \(outputUrl)")
+        if arguments.verbose {
+            print("swift-mock-gen: writing to \(outputUrl)")
+        }
 
         if !FileManager.default.fileExists(atPath: outputUrl.path) {
             FileManager.default.createFile(atPath: outputUrl.path, contents: nil, attributes: nil)

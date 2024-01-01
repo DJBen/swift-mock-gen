@@ -48,6 +48,21 @@ extension DeclModifierListSyntax {
             $0.name.text != TokenSyntax.keyword(.open).text
         }
     }
+
+    /// Given a modifier list, removing the scope modifier that is specific to "set".
+    /// e.g public private(set) becomes public.
+    /// - Returns: A modifier list after modifier specific to 'set' is removed.
+    func removingSetterModifier() -> DeclModifierListSyntax {
+        filter({
+            $0.detail?.detail.text != "set"
+        })
+    }
+
+    func removingWeakModifier() -> DeclModifierListSyntax {
+        filter({
+            $0.name.text != "weak"
+        })
+    }
 }
 
 extension AccessorBlockSyntax {
@@ -90,5 +105,105 @@ extension TypeSyntax {
             return funcTypeSyntax
         }
         return nil
+    }
+}
+
+extension VariableDeclSyntax {
+    var hasAtObjcAttribute: Bool {
+        attributes.contains { attr in
+            switch attr {
+            case .attribute(let attrSyntax):
+                return attrSyntax.attributeName.as(IdentifierTypeSyntax.self)?.name.text == "objc"
+            default:
+                return false
+            }
+        }
+    }
+
+    var hasWeakModifier: Bool {
+        modifiers.contains { modifier in
+            switch modifier.name.tokenKind {
+            case .keyword(let value):
+                return value == .weak
+            default:
+                return false
+            }
+        }
+    }
+}
+
+extension TypeSyntax {
+    func toImplicitOptional() -> ImplicitlyUnwrappedOptionalTypeSyntax {
+        if let optional = self.as(OptionalTypeSyntax.self) {
+            return ImplicitlyUnwrappedOptionalTypeSyntax(wrappedType: optional.wrappedType)
+        } else if let function = self.as(FunctionTypeSyntax.self) {
+            // Need to wrap function with parens
+            return ImplicitlyUnwrappedOptionalTypeSyntax(
+                wrappedType: TupleTypeSyntax(
+                    elements: TupleTypeElementListSyntax(
+                        itemsBuilder: {
+                            TupleTypeElementSyntax(type: function)
+                        }
+                    )
+                )
+            )
+        } else if let someOrAny = self.as(SomeOrAnyTypeSyntax.self) {
+            // Wrap some X or any X types with parens
+            return ImplicitlyUnwrappedOptionalTypeSyntax(
+                wrappedType: TupleTypeSyntax(
+                    elements: TupleTypeElementListSyntax(
+                        itemsBuilder: {
+                            TupleTypeElementSyntax(type: someOrAny)
+                        }
+                    )
+                )
+            )
+        } else {
+            return ImplicitlyUnwrappedOptionalTypeSyntax(wrappedType: self)
+        }
+    }
+
+    func toOptional() -> OptionalTypeSyntax {
+        if let optional = self.as(OptionalTypeSyntax.self) {
+            return optional
+        } else if let implicitOptional = self.as(ImplicitlyUnwrappedOptionalTypeSyntax.self) {
+            return OptionalTypeSyntax(wrappedType: implicitOptional.wrappedType)
+        }  else if let function = self.as(FunctionTypeSyntax.self) {
+            // Need to wrap function with parens
+            return OptionalTypeSyntax(
+                wrappedType: TupleTypeSyntax(
+                    elements: TupleTypeElementListSyntax(
+                        itemsBuilder: {
+                            TupleTypeElementSyntax(type: function)
+                        }
+                    )
+                )
+            )
+        } else if let someOrAny = self.as(SomeOrAnyTypeSyntax.self) {
+            // Wrap some X or any X types with parens
+            return OptionalTypeSyntax(
+                wrappedType: TupleTypeSyntax(
+                    elements: TupleTypeElementListSyntax(
+                        itemsBuilder: {
+                            TupleTypeElementSyntax(type: someOrAny)
+                        }
+                    )
+                )
+            )
+        } else {
+            return OptionalTypeSyntax(wrappedType: self)
+        }
+    }
+}
+
+
+extension TypeAnnotationSyntax {
+    func toOptional() -> TypeAnnotationSyntax {
+        TypeAnnotationSyntax(
+            leadingTrivia: leadingTrivia,
+            colon: colon,
+            type: type.toOptional(),
+            trailingTrivia: trailingTrivia
+        )
     }
 }
