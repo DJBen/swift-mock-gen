@@ -102,6 +102,14 @@ def generate_swift_mock_module(
         deps = [
             api_module
         ] + deps,
+        copts = [
+            # make headermaps available for transitive header preprocessing for
+            # imports from swift code
+            "-Xcc",
+            # headermap values, representing paths to headers, are paths relative to
+            # execroot, so we pass '-I.' to correctly resolve hmap header paths.
+            "-I.",
+        ],
         module_name = plain_target_name + "Mock",
         visibility = ["//visibility:public"],
     )

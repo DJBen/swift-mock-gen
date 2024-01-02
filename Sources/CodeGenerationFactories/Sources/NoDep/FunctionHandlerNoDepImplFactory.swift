@@ -10,8 +10,7 @@ public struct FunctionHandlerNoDepImplFactory {
         funcUniqueName: String
     ) throws -> VariableDeclSyntax {
         // Append protocol scope modifier to the function (public, internal, ...)
-        var modifiers = protocolFunctionDecl.modifiers
-        modifiers.clearScopeModifier()
+        var modifiers = protocolFunctionDecl.modifiers.clearingScopeModifier().removingOptionalModifier()
         if let scopeModifier = protocolDecl.modifiers.scopeModifier {
             modifiers.append(scopeModifier.trimmed)
         }
@@ -27,7 +26,7 @@ public struct FunctionHandlerNoDepImplFactory {
                         elements: TupleTypeElementListSyntax(
                             itemsBuilder: {
                                 TupleTypeElementSyntax(
-                                    type: protocolFunctionDecl.signature.toVariableDeclFunctionType()
+                                    type: protocolFunctionDecl.toVariableDeclFunctionType()
                                 )
                             }
                         )
@@ -39,21 +38,32 @@ public struct FunctionHandlerNoDepImplFactory {
     }
 }
 
-extension FunctionSignatureSyntax {
+extension FunctionDeclSyntax {
+    /// Turn the function signature to a variable return type.
+    /// - Returns: The type converted to a variable style.
     func toVariableDeclFunctionType() -> FunctionTypeSyntax {
         FunctionTypeSyntax(
             parameters: TupleTypeElementListSyntax(itemsBuilder: {
-                for param in parameterClause.parameters {
-                    TupleTypeElementSyntax(type: param.type)
+                for param in signature.parameterClause.parameters {
+                    if let identifierType = param.type.as(IdentifierTypeSyntax.self), let protocolConstraintType = genericParametersMap[identifierType.name.trimmed.text] {
+                        TupleTypeElementSyntax(
+                            type: SomeOrAnyTypeSyntax(
+                                someOrAnySpecifier: .keyword(.any),
+                                constraint: protocolConstraintType
+                            )
+                        )
+                    } else {
+                        TupleTypeElementSyntax(type: param.type)
+                    }
                 }
             }),
-            effectSpecifiers: effectSpecifiers.map {
+            effectSpecifiers: signature.effectSpecifiers.map {
                 TypeEffectSpecifiersSyntax(
                     asyncSpecifier: $0.asyncSpecifier,
                     throwsSpecifier: $0.throwsSpecifier
                 )
             },
-            returnClause: returnClause ?? ReturnClauseSyntax(type: IdentifierTypeSyntax(name: .identifier("Void")))
+            returnClause: signature.returnClause ?? ReturnClauseSyntax(type: IdentifierTypeSyntax(name: .identifier("Void")))
         )
     }
 }

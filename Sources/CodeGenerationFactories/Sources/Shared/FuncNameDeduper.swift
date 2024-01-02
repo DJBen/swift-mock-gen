@@ -1,5 +1,6 @@
 import SwiftSyntax
 
+/// Deduplicates function signatures and generates a unique name for the function signature.
 struct FuncNameDeduper {
     let funcNameMaps: [FuncNameDescriptor: String]
 

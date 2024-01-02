@@ -10,8 +10,7 @@ public struct FunctionMockImplFactory {
         protocolFunctionDecl: FunctionDeclSyntax
     ) throws -> FunctionDeclSyntax {
         // Append scope modifier to the function (public, internal, ...)
-        var modifiers = protocolFunctionDecl.modifiers
-        modifiers.clearScopeModifier()
+        var modifiers = protocolFunctionDecl.modifiers.clearingScopeModifier().removingOptionalModifier()
         if let scopeModifier = protocolDecl.modifiers.scopeModifier {
             modifiers.append(scopeModifier.trimmed)
         }

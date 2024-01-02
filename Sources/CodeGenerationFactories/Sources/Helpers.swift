@@ -39,8 +39,8 @@ extension DeclModifierListSyntax {
         })
     }
 
-    mutating func clearScopeModifier() {
-        self = filter {
+    func clearingScopeModifier() -> DeclModifierListSyntax {
+        filter {
             $0.name.text != TokenSyntax.keyword(.public).text ||
             $0.name.text != TokenSyntax.keyword(.private).text ||
             $0.name.text != TokenSyntax.keyword(.fileprivate).text ||
@@ -61,6 +61,12 @@ extension DeclModifierListSyntax {
     func removingWeakModifier() -> DeclModifierListSyntax {
         filter({
             $0.name.text != "weak"
+        })
+    }
+
+    func removingOptionalModifier() -> DeclModifierListSyntax {
+        filter({
+            $0.name.text != "optional"
         })
     }
 }
@@ -218,9 +224,23 @@ extension InheritedTypeListSyntax {
                         CompositionTypeElementSyntax(type: inheritedType.type)
                     }
                 }
-            )
+            ).trimmed
         } else {
             return first!.type
         }
+    }
+}
+
+extension FunctionDeclSyntax {
+    /// Returns a list of generic parameters with constraints
+    /// e.g. `func renderer<Item: FloatingPoint>` returns ["Item": "FloatingPoint"]
+    var genericParametersMap: [String: any TypeSyntaxProtocol] {
+        let paramMapPairs: [(String, any TypeSyntaxProtocol)] = genericParameterClause?.parameters.compactMap { param in
+            if param.colon != nil, let inheritedType = param.inheritedType {
+                return (param.name.trimmed.text, inheritedType)
+            }
+            return nil
+        } ?? []
+        return paramMapPairs.reduce(into: [String: any TypeSyntaxProtocol](), { $0[$1.0] = $1.1 })
     }
 }

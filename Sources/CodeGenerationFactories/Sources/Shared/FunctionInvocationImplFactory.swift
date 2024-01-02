@@ -30,7 +30,17 @@ public struct FunctionInvocationImplFactory {
                                     "\(raw: modifiers) let \(raw: name): Void"
                                 )
                             } else {
-                                try VariableDeclSyntax("\(raw: modifiers) let \(raw: name): \(funcParamSyntax.removingEscaping().type)")
+                                let genericParametersMap = protocolFunctionDecl.genericParametersMap
+                                let type = funcParamSyntax.removingEscaping().type
+                                if let identifierType = type.as(IdentifierTypeSyntax.self), let protocolConstraintType = genericParametersMap[identifierType.name.trimmed.text] {
+                                    let anyType = SomeOrAnyTypeSyntax(
+                                        someOrAnySpecifier: .keyword(.any),
+                                        constraint: protocolConstraintType
+                                    ).formatted()
+                                    try VariableDeclSyntax("\(raw: modifiers) let \(raw: name): \(anyType)")
+                                } else {
+                                    try VariableDeclSyntax("\(raw: modifiers) let \(raw: name): \(type)")
+                                }
                             }
                         }
                     }

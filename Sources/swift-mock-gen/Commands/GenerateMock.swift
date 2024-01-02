@@ -29,7 +29,7 @@ struct GenerateMock: ParsableCommand, ParseCommand, MockGenCommand {
                 let tree = Parser.parse(source: sourceBuffer)
                 for codeBlockItemSyntax in tree.statements {
                     if let protocolDecl = codeBlockItemSyntax.item.as(ProtocolDeclSyntax.self) {
-                        if mockGenArguments.excludeProtocols.contains(protocolDecl.name.text) {
+                        if mockGenArguments.excludeProtocols.contains(protocolDecl.name.trimmed.text) {
                             continue
                         }
                         let mockClass = try SourceFactory().classDecl(
