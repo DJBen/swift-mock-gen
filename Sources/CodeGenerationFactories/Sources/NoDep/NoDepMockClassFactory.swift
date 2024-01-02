@@ -6,17 +6,20 @@ public struct NoDepMockClassFactory {
     private let funcMockImplFactory: FunctionMockNoDepImplFactory
     private let functionHandlerImplFactory: FunctionHandlerNoDepImplFactory
     private let variableImplFactory: VariableImplFactory
+    private let genericParamsDeclsFactory: GenericParamsDeclsFactory
 
     public init(
         functionInvocationImplFactory: FunctionInvocationImplFactory = FunctionInvocationImplFactory(),
         funcMockImplFactory: FunctionMockNoDepImplFactory = FunctionMockNoDepImplFactory(),
         functionHandlerImplFactory: FunctionHandlerNoDepImplFactory = FunctionHandlerNoDepImplFactory(),
-        variableImplFactory: VariableImplFactory = VariableImplFactory()
+        variableImplFactory: VariableImplFactory = VariableImplFactory(),
+        genericParamsDeclsFactory: GenericParamsDeclsFactory = GenericParamsDeclsFactory()
     ) {
         self.functionInvocationImplFactory = functionInvocationImplFactory
         self.funcMockImplFactory = funcMockImplFactory
         self.functionHandlerImplFactory = functionHandlerImplFactory
         self.variableImplFactory = variableImplFactory
+        self.genericParamsDeclsFactory = genericParamsDeclsFactory
     }
 
     public func classDecl(
@@ -35,15 +38,21 @@ public struct NoDepMockClassFactory {
         }()
 
         let isObjcProtocol = protocolDecl.attributes.hasObjc || protocolDecl.isNSObjectProtocol
+        let protocolScopeModifiers = DeclModifierListSyntax {
+            // Append scope modifier to the function (public, internal, ...)
+            if let scopeModifier = protocolDecl.modifiers.scopeModifier {
+                scopeModifier.trimmed
+            }
+        }
+
+        let (genericParameterClause, typealiasDecls) = genericParamsDeclsFactory.decls(
+            protocolDecl: protocolDecl
+        )
 
         return try ClassDeclSyntax(
-            modifiers: DeclModifierListSyntax {
-                // Append the same scope modifier to the class (public, internal, ...)
-                if let scopeModifier = protocolDecl.modifiers.scopeModifier {
-                    scopeModifier.trimmed
-                }
-            },
+            modifiers: protocolScopeModifiers,
             name: "\(raw: name)",
+            genericParameterClause: genericParameterClause,
             inheritanceClause: InheritanceClauseSyntax {
                 if isObjcProtocol {
                     InheritedTypeListSyntax {
@@ -55,17 +64,17 @@ public struct NoDepMockClassFactory {
                 }
             }
         ) {
+            for typealiasDecl in typealiasDecls {
+                typealiasDecl
+            }
+
             // Add intializer only for non-NSObject class and only when protocol is public
             if !isObjcProtocol && protocolDecl.modifiers.isPublic {
                 InitializerDeclSyntax(
-                    modifiers: DeclModifierListSyntax {
-                        // Append scope modifier to the function (public, internal, ...)
-                        if let scopeModifier = protocolDecl.modifiers.scopeModifier {
-                            scopeModifier.trimmed
-                        }
-                    },
+                    modifiers: protocolScopeModifiers,
                     signature: FunctionSignatureSyntax(parameterClause: FunctionParameterClauseSyntax(parameters: FunctionParameterListSyntax(itemsBuilder: {})))
                 ) {}
+                .with(\.leadingTrivia, .newlines(2))
             }
 
             let funcDecls = protocolDecl.memberBlock.members.compactMap { member -> FunctionDeclSyntax? in

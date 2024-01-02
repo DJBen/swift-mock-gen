@@ -67,6 +67,7 @@ final class SwiftMockGenMacroTests: XCTestCase {
 
             #if DEBUG
             public class ServiceMock: ServiceProtocol  {
+
                 public init() {
                 }
 

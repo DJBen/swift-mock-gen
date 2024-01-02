@@ -41,7 +41,7 @@ public struct NoDepSourceFactory {
             )
         } else {
             DeclSyntax(
-                classDecl.with(\.leadingTrivia, .newlines(2))
+                classDecl.with(\.leadingTrivia, .newlines(2)).with(\.trailingTrivia, .newline)
             )
         }
 

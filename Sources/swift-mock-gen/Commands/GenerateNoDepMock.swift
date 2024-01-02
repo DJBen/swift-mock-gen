@@ -100,7 +100,10 @@ struct GenerateNoDepMock: ParsableCommand, ParseCommand, MockGenCommand {
 
             for protocolDecl in protocolDecls {
                 if mockGenArguments.excludeProtocols.contains(protocolDecl.name.text) {
-                    return
+                    if arguments.verbose {
+                        print("Skipping \(protocolDecl.name.text)")
+                    }
+                    continue
                 }
                 let sourceFileSyntax = try SourceFileSyntax {
                     for decl in try NoDepSourceFactory().decls(

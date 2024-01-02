@@ -4,12 +4,14 @@ import Foundation
 struct MockGenArguments: ParsableArguments {
     @Option(
         name: [.long, .customShort("i")],
+        parsing: .upToNextOption,
         help: "Additional modules to import; useful if you are compiling the generated files into a separate module, and thus needing to import the API module in which the protocols reside."
     )
     var additionalImports: [String] = []
 
     @Option(
         name: [.long],
+        parsing: .upToNextOption,
         help: "An list of protocols that are excluded from the mock generation."
     )
     var excludeProtocols: [String] = []
