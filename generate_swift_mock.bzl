@@ -80,6 +80,7 @@ def generate_swift_mock_module(
     name,
     srcs,
     api_module,
+    deps = [],
     copy_imports = True,
     exclude_protocols = [],
     generate_swift_mock_tool = "@swift_mock_gen//:swift-mock-gen"
@@ -100,7 +101,7 @@ def generate_swift_mock_module(
         srcs = [name],
         deps = [
             api_module
-        ],
+        ] + deps,
         module_name = plain_target_name + "Mock",
         visibility = ["//visibility:public"],
     )
