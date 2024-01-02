@@ -74,7 +74,7 @@ public struct ProtocolDepResolver {
                             fileName: sourceFile.fileName
                         )
                         protocolDeps.append(
-                            ProtocolDeps(name: protocolDecl.name.text, deps: protocolDecl.conformedNonNSObjectProtocols)
+                            ProtocolDeps(name: protocolDecl.name.trimmed.text, deps: protocolDecl.conformedNonNSObjectProtocols)
                         )
                         isSourceFileEmpty = false
                     }

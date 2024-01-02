@@ -1,4 +1,5 @@
 import XCTest
+import SwiftSyntax
 @testable import CodeGenerationFactories
 
 final class FuncNameDeduperTests: XCTestCase {
@@ -33,5 +34,44 @@ final class FuncNameDeduperTests: XCTestCase {
 
         let func1 = TestCases.Case1.functionDecl
         XCTAssertEqual(deduper.name(for: func1), "performRequest")
+    }
+
+    func testDeduper_wildcard() throws {
+        let func1 = try! FunctionDeclSyntax(
+            #"""
+            func log(_ error: SomeError)
+            """#
+        )
+
+        let func2 = try! FunctionDeclSyntax(
+            #"""
+            func log(_ checkpoint: SomeCheckpoint)
+            """#
+        )
+
+        let protocolDecl = try! ProtocolDeclSyntax(
+        #"""
+        @objc
+        public protocol Logger: NSObjectProtocol {
+            func log(_ error: SomeError)
+            func log(_ checkpoint: SomeCheckpoint)
+        }
+        """#
+        )
+
+        let deduper = FuncNameDeduper(
+            protocolDecl: protocolDecl,
+            funcDecls: [func1, func2]
+        )
+
+        XCTAssertEqual(
+            deduper.name(for: func1),
+            "log"
+        )
+
+        XCTAssertEqual(
+            deduper.name(for: func2),
+            "logCheckpoint"
+        )
     }
 }

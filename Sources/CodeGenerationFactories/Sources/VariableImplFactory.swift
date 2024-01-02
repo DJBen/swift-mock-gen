@@ -68,7 +68,10 @@ public struct VariableImplFactory {
                 // public var underlying_id: String!
                 VariableDeclSyntax(
                     attributes: [],
-                    modifiers: protocolVariableDecl.modifiers.removingSetterModifier().removingWeakModifier().trimmed,
+                    modifiers: protocolVariableDecl.modifiers.removingSetterModifier()
+                        .removingWeakModifier()
+                        .removingOptionalModifier()
+                        .trimmed,
                     bindingSpecifier: .keyword(.var),
                     bindingsBuilder: {
                         PatternBindingSyntax(
@@ -84,7 +87,9 @@ public struct VariableImplFactory {
                 VariableDeclSyntax(
                     attributes: [],
                     modifiers: {
-                        var getSetCountModifiers = protocolVariableDecl.modifiers.removingSetterModifier().removingWeakModifier().trimmed
+                        var getSetCountModifiers = protocolVariableDecl.modifiers.removingSetterModifier().removingWeakModifier()
+                            .removingOptionalModifier()
+                            .trimmed
 
                         getSetCountModifiers.append(
                             DeclModifierSyntax(
@@ -109,7 +114,9 @@ public struct VariableImplFactory {
                 VariableDeclSyntax(
                     attributes: [],
                     modifiers: {
-                        var getSetCountModifiers = protocolVariableDecl.modifiers.removingSetterModifier().removingWeakModifier().trimmed
+                        var getSetCountModifiers = protocolVariableDecl.modifiers.removingSetterModifier().removingWeakModifier()
+                            .removingOptionalModifier()
+                            .trimmed
 
                         getSetCountModifiers.append(
                             DeclModifierSyntax(

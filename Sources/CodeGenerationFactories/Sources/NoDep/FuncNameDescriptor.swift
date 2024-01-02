@@ -12,8 +12,20 @@ struct FuncNameDescriptor: Equatable, Hashable, CustomStringConvertible {
 
     init(funcDecl: FunctionDeclSyntax) {
         self.name = funcDecl.name.text
-        self.paramNames = funcDecl.signature.parameterClause.parameters.map { param in
-            param.firstName.text
+        // When disambiguating function names, consider non-wildcard (_) first name
+        // first, and second names with wildcard first names next.
+        // `log(a:b:)` vs `log(a:b:c)` can be disambiguated by the first names
+        // `log(_ a:)` vs `log(_ b:)` however needs to be disambiguated by the second names.
+        self.paramNames = funcDecl.signature.parameterClause.parameters.compactMap { param in
+            if param.firstName.tokenKind != .wildcard {
+                return param.firstName.text
+            }
+            return nil
+        } + funcDecl.signature.parameterClause.parameters.compactMap { param in
+            if param.firstName.tokenKind == .wildcard {
+                return param.secondName!.text
+            }
+            return nil
         }
     }
 

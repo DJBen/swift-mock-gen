@@ -45,14 +45,14 @@ public struct NoDepMockClassFactory {
             }
         }
 
-        let (genericParameterClause, typealiasDecls) = genericParamsDeclsFactory.decls(
+        let genericParamsDeclsResult = genericParamsDeclsFactory.decls(
             protocolDecl: protocolDecl
         )
 
         return try ClassDeclSyntax(
             modifiers: protocolScopeModifiers,
             name: "\(raw: name)",
-            genericParameterClause: genericParameterClause,
+            genericParameterClause: genericParamsDeclsResult.genericParameterClause,
             inheritanceClause: InheritanceClauseSyntax {
                 if isObjcProtocol {
                     InheritedTypeListSyntax {
@@ -60,11 +60,12 @@ public struct NoDepMockClassFactory {
                     }
                 }
                 InheritedTypeListSyntax {
-                    InheritedTypeSyntax(type: IdentifierTypeSyntax(name: .identifier("\(protocolDecl.name)")))
+                    InheritedTypeSyntax(type: IdentifierTypeSyntax(name: .identifier("\(protocolDecl.name.trimmed)")))
                 }
-            }
+            },
+            genericWhereClause: genericParamsDeclsResult.genericWhereClauseSyntax
         ) {
-            for typealiasDecl in typealiasDecls {
+            for typealiasDecl in genericParamsDeclsResult.typealiasDecls {
                 typealiasDecl
             }
 

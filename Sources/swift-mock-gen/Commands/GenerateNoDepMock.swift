@@ -99,9 +99,9 @@ struct GenerateNoDepMock: ParsableCommand, ParseCommand, MockGenCommand {
             """)
 
             for protocolDecl in protocolDecls {
-                if mockGenArguments.excludeProtocols.contains(protocolDecl.name.text) {
+                if mockGenArguments.excludeProtocols.contains(protocolDecl.name.trimmed.text) {
                     if arguments.verbose {
-                        print("Skipping \(protocolDecl.name.text)")
+                        print("Skipping \(protocolDecl.name.trimmed.text)")
                     }
                     continue
                 }
