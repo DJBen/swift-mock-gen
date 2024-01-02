@@ -207,3 +207,20 @@ extension TypeAnnotationSyntax {
         )
     }
 }
+
+extension InheritedTypeListSyntax {
+    /// Convert from `associatedtype Subject: ExecutorSubject, FloatingPoint` to `<P1: ExecutorSubject & FloatingPoint>`
+    func toCompositionOrIdentifierType() -> any TypeSyntaxProtocol {
+        if count > 1 {
+            return CompositionTypeSyntax(
+                elements: CompositionTypeElementListSyntax {
+                    for inheritedType in self {
+                        CompositionTypeElementSyntax(type: inheritedType.type)
+                    }
+                }
+            )
+        } else {
+            return first!.type
+        }
+    }
+}

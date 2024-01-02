@@ -8,8 +8,8 @@ Modern `SwiftMacro` support makes integration lightweight.
 
 ## Install CLI
 ### Swift Package Manager
-You can build `swift-mock-gen` by checking out the repo and run 
-```swift build```, 
+You can build `swift-mock-gen` by checking out the repo and run
+```swift build```,
 the executable should be built into `.build/debug` directory.
 
 Alternatively, you may use `swift run swift-mock-gen ...`.
@@ -146,10 +146,33 @@ For protocols annotated with `@objc` and conforms to `NSObjectProtocol`, the moc
 - `throws` functions are supported: All the call site will have `try` preceeding the function signature.
 - `async` functions are supported. All the call site will have `await` preceeding the function signature.
 
+### Generics support
+
+The tool supports generating mock impls for protocls that have generics in them. For example the below case contains two generics: `Subject` conforms to `ExecutorSubject`, `A` and `B`, and `ErrorType` is aliased to `Never`.
+
+```swift
+public protocol Executor<Subject, ErrorType> {
+    associatedtype Subject: ExecutorSubject, A, B
+    associatedtype ErrorType = Never
+    func perform(_ subjects: [Subject]) async throws -> [Subject]
+}
+```
+
+The below mock is generated. Each associated type with inheritance requirement will produce a generic parameter, and aliased associated type is kept.
+
+```swift
+public class ExecutorMock<P1: ExecutorSubject & A & B>: Executor {
+    public typealias Subject = P1
+    public typealias ErrorType = Never
+
+    // ... generated mock functions
+}
+```
+
 ### Transitive protocol conformances
 When a protocol conforms to another protocol, naive per-protocol generation would not include the methods of parent protocol.
 
-For example, 
+For example,
 ```swift
 protocol P1: NSObjectProtocol, P2, P3 {
     func p1()
