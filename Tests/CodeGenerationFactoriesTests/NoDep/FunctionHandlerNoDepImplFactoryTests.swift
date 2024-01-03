@@ -80,4 +80,32 @@ final class FunctionHandlerNoDepImplFactoryTests: XCTestCase {
             """#
         )
     }
+
+    func test_objcFunction_handlerShouldHaveObjc() throws {
+        let result = try FunctionHandlerNoDepImplFactory().declaration(
+            protocolDecl: TestCases.Case1.protocolDecl,
+            protocolFunctionDecl: try FunctionDeclSyntax(
+                """
+                @objc
+                func performRequest(
+                    request: URLRequest,
+                    reportId: String,
+                    includeLogs: Bool,
+                    onSuccess: @escaping () -> Void,
+                    onPermanentFailure: @escaping (Error, String) -> Void
+                ) -> String
+                """
+            ),
+            funcUniqueName: "performRequest"
+        )
+
+        assertBuildResult(
+            result,
+            #"""
+
+
+            @objc public var handler_performRequest: ((URLRequest, String, Bool, @escaping () -> Void, @escaping (Error, String) -> Void) -> String)?
+            """#
+        )
+    }
 }
