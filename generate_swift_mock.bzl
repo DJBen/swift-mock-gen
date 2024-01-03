@@ -43,6 +43,8 @@ def _generate_swift_mock_impl(ctx):
         args.append("-i")
         for additional_import in ctx.attr.additional_imports:
             args.append(additional_import)
+    if ctx.attr.verbose:
+        args.append("-v")
 
     outputs = []
 
@@ -77,6 +79,7 @@ generate_swift_mock = rule(
         "additional_imports": attr.string_list(doc="Additional modules to import; useful if you are compiling the generated files into a separate module, and thus needing to import the API module in which the protocols reside."),
         "exclude_protocols": attr.string_list(doc="List of protocols to exclude from protocol generation"),
         "srcs": attr.label_list(allow_files=True, doc="Source files"),
+        "verbose": attr.bool(doc="Whether to print verbose debug messages to stdout."),
         "generate_swift_mock_tool": attr.label(
             executable=True,
             cfg="exec",
@@ -94,6 +97,7 @@ def generate_swift_mock_module(
     copy_imports = True,
     exclude_protocols = [],
     additional_imports = [],
+    verbose = False,
     generate_swift_mock_tool = "@swift_mock_gen//:swift-mock-gen",
     **kwargs,
 ):
@@ -108,6 +112,7 @@ def generate_swift_mock_module(
         copy_imports (bool): whether to copy the imports declared in the api source files. Defaults to true
         exclude_protocols (list): A str list of protocols that shall be excluded from mock generation. Use this if you encounter a problem in compilation.
         additional_imports (list): Additional imports to add to the mock.
+        verbose (bool): Whether to print verbose debug messages to stdout.
         generate_swift_mock_tool (str): The label of the mock generation tool.
         **kwargs:
     """
@@ -123,6 +128,7 @@ def generate_swift_mock_module(
         additional_imports = [api_module_name] + additional_imports,
         exclude_protocols = exclude_protocols,
         generate_swift_mock_tool = generate_swift_mock_tool,
+        verbose = verbose,
     )
 
     swift_library(
@@ -141,23 +147,4 @@ def generate_swift_mock_module(
         ],
         module_name = mock_module_name,
         visibility = kwargs.get('visibility', ["//visibility:public"]),
-    )
-
-def swift_mock_gen_config(
-    exclude_protocols = [],
-    verbose = False,
-):
-    """
-    A config that controls swift mock gen behavior.
-
-    Args:
-        exclude_protocols (list): A list of protocol names to be excluded from the
-                                  Swift mock generation process. This parameter allows
-                                  selective exclusion of certain protocols from being
-                                  mocked. If left empty, no protocols are excluded.
-        verbose (bool): A flag to toggle verbose outputs.
-    """
-    return struct(
-        exclude_protocols = exclude_protocols,
-        verbose = verbose,
     )
