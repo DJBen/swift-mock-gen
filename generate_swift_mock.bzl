@@ -5,15 +5,25 @@ load("@build_bazel_rules_swift//swift:swift.bzl", "swift_library")
 load("@bazel_skylib//lib:paths.bzl", "paths")
 
 def _extract_target_name(label):
-    # Extract the target name from a Bazel label
+    """
+    Extract the target name from a Bazel label.
+    """
+    if label.startswith("@"):
+        # For external repositories, split by '//' and then process
+        label = label.split("//")[-1]
+
     if label.startswith("//"):
-        # Full label, split by ':'
-        return label.split(":")[-1]
+        parts = label.split(":")
+        if len(parts) == 2:
+            # Full label with explicit target, split by ':'
+            return parts[-1]
+        else:
+            # Full label with implicit target (same as package name)
+            return parts[0].split("/")[-1]
     elif label.startswith(":"):
         # Relative label, remove the leading ':'
         return label[1:]
     else:
-        # Default case, return the label as is
         return label
 
 def _generate_swift_mock_impl(ctx):
@@ -77,28 +87,47 @@ generate_swift_mock = rule(
 )
 
 def generate_swift_mock_module(
-    name,
-    srcs,
     api_module,
+    srcs,
+    mock_module_name = None,
     deps = [],
     copy_imports = True,
     exclude_protocols = [],
-    generate_swift_mock_tool = "@swift_mock_gen//:swift-mock-gen"
+    additional_imports = [],
+    generate_swift_mock_tool = "@swift_mock_gen//:swift-mock-gen",
+    **kwargs,
 ):
-    plain_target_name = _extract_target_name(api_module)
+    """
+    Generate the swift mock module from sources.
+
+    Args:
+        api_module (str): the label string of the API module.
+        srcs (list): The source files.
+        mock_module_name (Optional[str]): if preesnt, the generated mock module will take this name; otherwise it's the api_module's name + 'Mock'.
+        deps (depset): The dependencies of the mock module aside of the api_module.
+        copy_imports (bool): whether to copy the imports declared in the api source files. Defaults to true
+        exclude_protocols (list): A str list of protocols that shall be excluded from mock generation. Use this if you encounter a problem in compilation.
+        additional_imports (list): Additional imports to add to the mock.
+        generate_swift_mock_tool (str): The label of the mock generation tool.
+        **kwargs:
+    """
+
+    api_module_name = _extract_target_name(api_module)
+    mock_module_name = api_module_name + "Mock" if mock_module_name == None else mock_module_name
+    gen_mock_rule_name = (api_module_name if mock_module_name == None else api_module_name + "_" + mock_module_name) + "_GenerateSwiftMock"
 
     generate_swift_mock(
-        name = name,
+        name = gen_mock_rule_name,
         srcs = srcs,
         copy_imports = copy_imports,
-        additional_imports = [plain_target_name],
+        additional_imports = [api_module_name] + additional_imports,
         exclude_protocols = exclude_protocols,
         generate_swift_mock_tool = generate_swift_mock_tool,
     )
 
     swift_library(
-        name = plain_target_name + "Mock",
-        srcs = [name],
+        name = mock_module_name,
+        srcs = [gen_mock_rule_name],
         deps = [
             api_module
         ] + deps,
@@ -110,8 +139,8 @@ def generate_swift_mock_module(
             # execroot, so we pass '-I.' to correctly resolve hmap header paths.
             "-I.",
         ],
-        module_name = plain_target_name + "Mock",
-        visibility = ["//visibility:public"],
+        module_name = mock_module_name,
+        visibility = kwargs.get('visibility', ["//visibility:public"]),
     )
 
 def swift_mock_gen_config(

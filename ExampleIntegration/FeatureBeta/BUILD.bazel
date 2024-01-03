@@ -3,31 +3,40 @@ load("@swift_mock_gen//:generate_swift_mock.bzl", "generate_swift_mock_module")
 
 swift_library(
     name = "Example",
-    srcs = glob(["Sources/Example/**/*.swift"]),
+    srcs = glob(["Sources/**/*.swift"]),
     deps = [
+        "//CommonFeature",
     ],
     visibility = ["//visibility:public"],
+    module_name = "Example",
 )
 
 swift_library(
     name = "ExampleImpl",
-    srcs = glob(["Sources/ExampleImpl/**/*.swift"]),
+    srcs = glob(["ExampleImpl/**/*.swift"]),
     deps = [
         ":Example",
     ],
     visibility = ["//visibility:public"],
+    module_name = "ExampleImpl",
 )
 
 generate_swift_mock_module(
-    name = "generate_swift_mock_module",
-    srcs = glob(["Sources/Example/**/*.swift"]),
     api_module = ":Example",
+    srcs = glob(["Sources/**/*.swift"]),
+    exclude_protocols = [],
+)
+
+generate_swift_mock_module(
+    api_module = ":Example",
+    srcs = glob(["Sources/**/*.swift"]),
+    mock_module_name = "ExampleForAlphaMock",
     exclude_protocols = [],
 )
 
 swift_test(
     name = "ExampleImplTests",
-    srcs = glob(["Tests/ExampleImplTests/**/*.swift"]),
+    srcs = glob(["ExampleImplTests/**/*.swift"]),
     deps = [
         ":Example",
         ":ExampleImpl",

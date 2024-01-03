@@ -1,6 +1,5 @@
 import XCTest
 import Example
-import ExampleMock
 @testable import ExampleImpl
 
 // ExampleMock is a generated target consisting of all the mock impls of the protocols from the `Example` target.
@@ -16,7 +15,7 @@ final class ExampleImplTests: XCTestCase {
     }
 
     func testExample() throws {
-        XCTAssertEqual(ExampleImpl().helloWorld(), "Hello world")
+        XCTAssertEqual(ExampleImpl(id: "id").helloWorld(), "Hello world")
     }
 
     func testDemoExampleMock() throws {
