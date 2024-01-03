@@ -16,7 +16,11 @@ public struct FunctionHandlerNoDepImplFactory {
         }
 
         return VariableDeclSyntax(
-            attributes: [],
+            attributes: AttributeListSyntax {
+                if protocolFunctionDecl.attributes.hasObjc {
+                    "@objc"
+                }
+            },
             modifiers: modifiers,
             .var,
             name: PatternSyntax("handler_\(raw: funcUniqueName)"),

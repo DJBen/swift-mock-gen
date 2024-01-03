@@ -144,7 +144,7 @@ def generate_swift_mock_module(
             # headermap values, representing paths to headers, are paths relative to
             # execroot, so we pass '-I.' to correctly resolve hmap header paths.
             "-I.",
-        ],
+        ] + kwargs.get('copts', []),
         module_name = mock_module_name,
         visibility = kwargs.get('visibility', ["//visibility:public"]),
     )
