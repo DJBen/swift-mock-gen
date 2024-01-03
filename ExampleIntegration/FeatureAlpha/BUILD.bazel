@@ -1,0 +1,21 @@
+load("@build_bazel_rules_swift//swift:swift.bzl", "swift_library", "swift_test")
+
+swift_library(
+    name = "OtherImpl",
+    srcs = glob(["Sources/**/*.swift"]),
+    deps = [
+        "//FeatureBeta:Example",
+    ],
+    visibility = ["//visibility:public"],
+    module_name = "OtherImpl",
+)
+
+swift_test(
+    name = "OtherImplTests",
+    srcs = glob(["Tests/**/*.swift"]),
+    deps = [
+        ":OtherImpl",
+        "//FeatureBeta:Example",
+        "//FeatureBeta:ExampleForAlphaMock", # a ${Target}Mock library will be synthesized consisting of mocks of all the protocols in the api_module library.
+    ],
+)
