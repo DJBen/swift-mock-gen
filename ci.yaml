@@ -13,3 +13,7 @@ on:
       jobs:
         - script: snapci/cool.sh
           run_on: "mac_studio"
+    - body: "/publish_binaries"
+      jobs:
+        - script: snapci/publish_binaries.sh
+          run_on: "mac_studio"
