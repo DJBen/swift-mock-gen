@@ -6,8 +6,8 @@ echo "Selecting Xcode 15.0"
 sudo xcode-select -s /Applications/Xcode15.0_15A240d.app/Contents/Developer
 echo "Building and testing swift_mock_gen fat binaries..."
 
-swift build --target swift-mock-gen -c release --arch x86_64
-swift build --target swift-mock-gen -c release --arch arm64
+swift build -c release --arch x86_64
+swift build -c release --arch arm64
 
 echo "Zipping swift-mock-gen binaries"
 mkdir -p .build/dist
