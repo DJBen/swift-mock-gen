@@ -15,7 +15,8 @@ public enum SwiftMockGenMacro: PeerMacro {
         return try sourceFactory.decls(
             protocolDecl: protocolDecl,
             surroundWithPoundIfDebug: true,
-            importDeclsToCopy: []
+            importDeclsToCopy: [],
+            customGenericTypes: [:]
         )
     }
 }

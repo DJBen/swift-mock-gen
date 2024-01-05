@@ -98,6 +98,8 @@ struct GenerateNoDepMock: ParsableCommand, ParseCommand, MockGenCommand {
 
             """)
 
+            let customGenericTypeMap = try mockGenArguments.customGenericTypeMap
+
             for protocolDecl in protocolDecls {
                 if mockGenArguments.excludeProtocols.contains(protocolDecl.name.trimmed.text) {
                     if arguments.verbose {
@@ -109,7 +111,8 @@ struct GenerateNoDepMock: ParsableCommand, ParseCommand, MockGenCommand {
                     for decl in try NoDepSourceFactory().decls(
                         protocolDecl: protocolDecl,
                         surroundWithPoundIfDebug: surroundWithPoundIfDebug,
-                        importDeclsToCopy: imports
+                        importDeclsToCopy: imports,
+                        customGenericTypes: customGenericTypeMap[protocolDecl.name.trimmed.text] ?? [:]
                     ) {
                         decl
                     }

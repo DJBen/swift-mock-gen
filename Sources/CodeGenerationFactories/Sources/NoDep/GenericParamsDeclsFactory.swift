@@ -16,7 +16,8 @@ public struct GenericParamsDeclsFactory {
     public init() {}
 
     public func decls(
-        protocolDecl: ProtocolDeclSyntax
+        protocolDecl: ProtocolDeclSyntax,
+        customGenericTypes: [String: String]
     ) -> Result {
         let protocolScopeModifiers = DeclModifierListSyntax {
             // Append scope modifier to the function (public, internal, ...)
@@ -42,31 +43,44 @@ public struct GenericParamsDeclsFactory {
                         )
                     )
                 } else if let inheritanceClause = associatedTypeDecl.inheritanceClause {
-                    typealiasDecls.append(
-                        TypeAliasDeclSyntax(
-                            modifiers: protocolScopeModifiers,
-                            name: associatedTypeDecl.name,
-                            initializer: TypeInitializerClauseSyntax(value: IdentifierTypeSyntax(name: .identifier("P\(genericInheritanceCount + 1)")))
-                        )
-                    )
 
-                    genericParameters.append(
-                        GenericParameterSyntax(
-                            name: .identifier("P\(genericInheritanceCount + 1)"),
-                            colon: .colonToken(),
-                            inheritedType: inheritanceClause.inheritedTypes.toCompositionOrIdentifierType()
-                        ).trimmed
-                    )
-
-                    if let whereClause = associatedTypeDecl.genericWhereClause {
-                        requirements.append(contentsOf: whereClause.requirements.map {
-                            $0.replacingBaseType(
-                                IdentifierTypeSyntax(name: .identifier("P\(genericInheritanceCount + 1)"))
+                    if let customType = customGenericTypes[associatedTypeDecl.name.trimmed.text] {
+                        
+                        // If a custom type for a generic type is provided, we set the typealias without synthesizing a generic type.
+                        typealiasDecls.append(
+                            TypeAliasDeclSyntax(
+                                modifiers: protocolScopeModifiers,
+                                name: associatedTypeDecl.name,
+                                initializer: TypeInitializerClauseSyntax(value: IdentifierTypeSyntax(name: .identifier(customType)))
                             )
-                        })
-                    }
+                        )
+                    } else {
+                        typealiasDecls.append(
+                            TypeAliasDeclSyntax(
+                                modifiers: protocolScopeModifiers,
+                                name: associatedTypeDecl.name,
+                                initializer: TypeInitializerClauseSyntax(value: IdentifierTypeSyntax(name: .identifier("P\(genericInheritanceCount + 1)")))
+                            )
+                        )
 
-                    genericInheritanceCount += 1
+                        genericParameters.append(
+                            GenericParameterSyntax(
+                                name: .identifier("P\(genericInheritanceCount + 1)"),
+                                colon: .colonToken(),
+                                inheritedType: inheritanceClause.inheritedTypes.toCompositionOrIdentifierType()
+                            ).trimmed
+                        )
+
+                        if let whereClause = associatedTypeDecl.genericWhereClause {
+                            requirements.append(contentsOf: whereClause.requirements.map {
+                                $0.replacingBaseType(
+                                    IdentifierTypeSyntax(name: .identifier("P\(genericInheritanceCount + 1)"))
+                                )
+                            })
+                        }
+
+                        genericInheritanceCount += 1
+                    }
                 } else {
                     // A plain associated type like `associatedtype UserID`
                     genericParameters.append(

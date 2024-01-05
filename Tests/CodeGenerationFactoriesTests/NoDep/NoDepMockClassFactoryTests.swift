@@ -184,6 +184,53 @@ final class NoDepMockClassFactoryTests: XCTestCase {
         )
     }
 
+    func testGenerics_customGenericTypes() throws {
+        let result = try NoDepMockClassFactory().classDecl(
+            protocolDecl: try! ProtocolDeclSyntax(
+            #"""
+            public protocol Executor<Subject, Handler, ErrorType> {
+                associatedtype Subject: ExecutorSubject
+                associatedtype Handler: SomeHandler
+                associatedtype ErrorType = Never
+                func perform(_ subjects: [Subject]) async throws -> [Subject]
+            }
+            """#
+            ),
+            customGenericTypes: ["Subject": "MySubject", "Handler": "MyHandler"]
+        )
+
+        assertBuildResult(
+            result,
+            ##"""
+            public class ExecutorMock: Executor {
+                public typealias Subject = MySubject
+                public typealias Handler = MyHandler
+                public typealias ErrorType = Never
+
+                public init() {
+                }
+                public struct Invocation_perform {
+                    public let subjects: [Subject]
+                }
+                private (set) var invocations_perform = [Invocation_perform] ()
+
+                public var handler_perform: (([Subject]) async throws -> [Subject])?
+
+                public func perform(_ subjects: [Subject]) async throws -> [Subject] {
+                    let invocation = Invocation_perform(
+                        subjects: subjects
+                    )
+                    invocations_perform.append(invocation)
+                    if let handler = handler_perform {
+                        return try await handler(subjects)
+                    }
+                    fatalError("Please set handler_perform")
+                }
+            }
+            """##
+        )
+    }
+
     func testFunctionGenerics() throws {
         let result = try NoDepMockClassFactory().classDecl(
             protocolDecl: try! ProtocolDeclSyntax(

@@ -53,6 +53,8 @@ OPTIONS:
                           Support mocks of protocols with conformance to another protocol to be
                           generated correcly, as long as the dependent protocol is included.
                           Enabling this option may consume more memory. (default: --transitive-protocol-conformance)
+  --custom-generic-types <custom-generic-types>
+                          A JSON formatted map of custom generic types for each protocol... (default: {})
   --surround-with-pound-if-debug/--no-surround-with-pound-if-debug
                           Surround with #if DEBUG directives. This ensures the mock only be included in DEBUG targets. (default:
                           --no-surround-with-pound-if-debug)
@@ -207,6 +209,23 @@ public class ExecutorMock<P1: ExecutorSubject & A & B>: Executor {
     // ... generated mock functions
 }
 ```
+
+#### Supplying custom generic types
+In the above example, generated mocks have synthesized generic arguments `P1`.
+Sometimes we want to use an explicitly defined type, for example `MySubject`.
+
+```swift
+public class ExecutorMock: Executor {
+    public typealias Subject = MySubject
+    public typealias ErrorType = Never
+    ...
+}
+```
+
+One can leverage the `--custom-generic-types` argument to supply a custom type
+mapping. The mapping is in format of `{"<ProtocolName>": {"<GenericTypeName>": "<CustomType>", ...}, ...}`.
+
+In this example, one would supply `--custom-generic-types "{\"Executor\": {\"Subject\": \"MySubject\"}}"` to achieve the desired custom types.
 
 ### Transitive protocol conformances
 When a protocol conforms to another protocol, naive per-protocol generation would not include the methods of parent protocol.
