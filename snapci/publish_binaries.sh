@@ -28,6 +28,6 @@ GS_URL="gs://phantom-dependency-uploads/swift-mock-gen.zip"
 echo "Posting PR Comment..."
 escaped_url=$(escape_slashes "${PHANTOM_DEP_UPLOADER_URL}")
 escaped_gs_url=$(escape_slashes "${GS_URL}")
-comment="Done! Go to ${escaped_url} to trigger phantom dependency uploader.\r\n dependency_name: swift-mock-gen\r\n dependency_package_url: ${escaped_gs_url}\r\n dependency_files: swift-mock-gen_arm64-apple-macosx,swift-mock-gen_x86_64-apple-macosx\r\n dependency_owner: APPINS"
+comment="Done! In order to get md5, version, and sha256, go to ${escaped_url} to trigger phantom dependency uploader and you'll receive an email when it finishes.\r\n pull_number: <Any integer>\r\n branch: master\r\n dependency_name: swift-mock-gen\r\n dependency_package_url: ${escaped_gs_url}\r\n dependency_files: swift-mock-gen_arm64-apple-macosx,swift-mock-gen_x86_64-apple-macosx\r\n dependency_owner: APPINS contact_email: <Your email>"
 
 post_comment "${comment}"
