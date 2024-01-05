@@ -13,10 +13,12 @@ public struct NoDepSourceFactory {
     public func decls(
         protocolDecl: ProtocolDeclSyntax,
         surroundWithPoundIfDebug: Bool,
-        importDeclsToCopy: [ImportDeclSyntax]
+        importDeclsToCopy: [ImportDeclSyntax],
+        customGenericTypes: [String: String]
     ) throws -> [DeclSyntax] {
         let classDecl = try mockClassFactory.classDecl(
-            protocolDecl: protocolDecl
+            protocolDecl: protocolDecl,
+            customGenericTypes: customGenericTypes
         )
         var decls = [DeclSyntax]()
 

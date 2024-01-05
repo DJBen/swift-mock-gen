@@ -23,7 +23,8 @@ public struct NoDepMockClassFactory {
     }
 
     public func classDecl(
-        protocolDecl: ProtocolDeclSyntax
+        protocolDecl: ProtocolDeclSyntax,
+        customGenericTypes: [String: String] = [:]
     ) throws -> some DeclSyntaxProtocol {
         // Name rule:
         // - If ending with `-Protocol`, remove and append `Mock`.
@@ -46,7 +47,8 @@ public struct NoDepMockClassFactory {
         }
 
         let genericParamsDeclsResult = genericParamsDeclsFactory.decls(
-            protocolDecl: protocolDecl
+            protocolDecl: protocolDecl,
+            customGenericTypes: customGenericTypes
         )
 
         return try ClassDeclSyntax(
