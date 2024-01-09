@@ -44,14 +44,10 @@ function deploy() {
     sha256=$(shasum -a 256 "${archive_path}" | awk '{print $1}')
     quoted_sha="\\\"${sha256}\\\""
 
-    echo "Getting md5 of the binary"
-    md5=$(md5sum "${archive_path}" | awk '{print $1}')
-    quoted_md5="\\\"${md5}\\\""
-
     echo "Posting PR Comment..."
     escaped_url=$(escape_slashes "${HTTP_URL}")
     quoted_url="\\\"${escaped_url}\\\""
-    comment="Rules published:\r\n    sha256 = ${quoted_sha},\r\n    md5 = ${quoted_md5},\r\n    url = ${quoted_url}"
+    comment="Rules published:\r\n    sha256 = ${quoted_sha},\r\n    url = ${quoted_url}"
 
     post_comment "${comment}"
 }
