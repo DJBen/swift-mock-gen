@@ -23,7 +23,7 @@ public protocol ServiceProtocol {
 ```
 
 ### Command Line Interface (CLI)
-One can run the `swift-mock-gen` executable target with either Swift Pacakge Manager or Bazel.
+One can run the `swift-mock-gen` executable target with either Swift Package Manager or Bazel.
 ```
 swift run swift-mock-gen gen <arguments>
 bazel run :swift-mock-gen gen <arguments>
