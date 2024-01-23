@@ -47,6 +47,8 @@ public struct FunctionInvocationImplFactory {
                 )
             ),
             DeclSyntax(
+                protocolDecl.modifiers.isPublic ?
+                try VariableDeclSyntax("public private (set) var invocations_\(raw: funcUniqueName) = [Invocation_\(raw: funcUniqueName)]()") :
                 try VariableDeclSyntax("private (set) var invocations_\(raw: funcUniqueName) = [Invocation_\(raw: funcUniqueName)]()")
             )
         ]

@@ -32,7 +32,7 @@ final class MockClassFactoryTests: XCTestCase {
                     public let onSuccess: Void
                     public let onPermanentFailure: Void
                 }
-                private (set) var invocations_performRequest = [Invocation_performRequest] ()
+                public private (set) var invocations_performRequest = [Invocation_performRequest] ()
 
                 @objc public func performRequest(
                         request: URLRequest,
@@ -199,7 +199,7 @@ final class MockClassFactoryTests: XCTestCase {
                     public let name: String
                     public let secondName: String?
                 }
-                private (set) var invocations_initialize = [Invocation_initialize] ()
+                public private (set) var invocations_initialize = [Invocation_initialize] ()
 
                 public func initialize(name: String, secondName: String?) {
                     let invocation = Invocation_initialize(
@@ -260,7 +260,7 @@ final class MockClassFactoryTests: XCTestCase {
                 private (set) var expectations_fetchConfig: [(Stub_fetchConfig, Expectation?)] = []
                 public struct Invocation_fetchConfig {
                 }
-                private (set) var invocations_fetchConfig = [Invocation_fetchConfig] ()
+                public private (set) var invocations_fetchConfig = [Invocation_fetchConfig] ()
             
                 public func fetchConfig() async throws -> [String: String] {
                     let invocation = Invocation_fetchConfig(
@@ -320,7 +320,7 @@ final class MockClassFactoryTests: XCTestCase {
                 public struct Invocation_fetchData {
                     public let name: (String, count: Int)
                 }
-                private (set) var invocations_fetchData = [Invocation_fetchData] ()
+                public private (set) var invocations_fetchData = [Invocation_fetchData] ()
             
                 public func fetchData(_ name: (String, count: Int)) async -> (() -> Void) {
                     let invocation = Invocation_fetchData(
