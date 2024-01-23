@@ -26,7 +26,7 @@ final class FunctionInvocationImplFactoryTests: XCTestCase {
                 public let secondName: String?
                 public let completion: Void
             }
-            private (set) var invocations_initialize = [Invocation_initialize] ()
+            public private (set) var invocations_initialize = [Invocation_initialize] ()
             """#
         )
     }
@@ -52,7 +52,7 @@ final class FunctionInvocationImplFactoryTests: XCTestCase {
                 public let secondName: String?
                 public let completion: SomeBlock
             }
-            private (set) var invocations_initialize = [Invocation_initialize] ()
+            public private (set) var invocations_initialize = [Invocation_initialize] ()
             """#
         )
     }

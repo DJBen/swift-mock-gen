@@ -38,7 +38,7 @@ final class FunctionClassMemberImplFactoryTests: XCTestCase {
                 public let onSuccess: Void
                 public let onPermanentFailure: Void
             }
-            private (set) var invocations_performRequest = [Invocation_performRequest] ()
+            public private (set) var invocations_performRequest = [Invocation_performRequest] ()
             """#
         )
     }
@@ -70,7 +70,7 @@ final class FunctionClassMemberImplFactoryTests: XCTestCase {
             private (set) var expectations_fetchConfig: [(Stub_fetchConfig, Expectation?)] = []
             public struct Invocation_fetchConfig {
             }
-            private (set) var invocations_fetchConfig = [Invocation_fetchConfig] ()
+            public private (set) var invocations_fetchConfig = [Invocation_fetchConfig] ()
             """#
         )
     }

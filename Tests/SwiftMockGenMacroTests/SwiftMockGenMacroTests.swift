@@ -136,7 +136,7 @@ final class SwiftMockGenMacroTests: XCTestCase {
                     public let name: String
                     public let secondName: String?
                 }
-                private (set) var invocations_initialize = [Invocation_initialize] ()
+                public private (set) var invocations_initialize = [Invocation_initialize] ()
 
                 public var handler_initialize: ((String, String?) -> Void)?
 
@@ -152,7 +152,7 @@ final class SwiftMockGenMacroTests: XCTestCase {
                 }
                 public struct Invocation_fetchConfig {
                 }
-                private (set) var invocations_fetchConfig = [Invocation_fetchConfig] ()
+                public private (set) var invocations_fetchConfig = [Invocation_fetchConfig] ()
 
                 public var handler_fetchConfig: (() async throws -> [String: String])?
 
@@ -169,7 +169,7 @@ final class SwiftMockGenMacroTests: XCTestCase {
                 public struct Invocation_fetchData {
                     public let name: (String, count: Int)
                 }
-                private (set) var invocations_fetchData = [Invocation_fetchData] ()
+                public private (set) var invocations_fetchData = [Invocation_fetchData] ()
 
                 public var handler_fetchData: (((String, count: Int)) async -> (() -> Void))?
 

@@ -28,7 +28,7 @@ final class NoDepMockClassFactoryTests: XCTestCase {
                 }
                 public struct Invocation_generateUserIdentifier {
                 }
-                private (set) var invocations_generateUserIdentifier = [Invocation_generateUserIdentifier] ()
+                public private (set) var invocations_generateUserIdentifier = [Invocation_generateUserIdentifier] ()
 
                 public var handler_generateUserIdentifier: (() -> UserID)?
 
@@ -71,7 +71,7 @@ final class NoDepMockClassFactoryTests: XCTestCase {
                 }
                 public struct Invocation_generateUserIdentifier {
                 }
-                private (set) var invocations_generateUserIdentifier = [Invocation_generateUserIdentifier] ()
+                public private (set) var invocations_generateUserIdentifier = [Invocation_generateUserIdentifier] ()
 
                 public var handler_generateUserIdentifier: (() -> UserID)?
 
@@ -118,7 +118,7 @@ final class NoDepMockClassFactoryTests: XCTestCase {
                 public struct Invocation_perform {
                     public let subjects: [Subject]
                 }
-                private (set) var invocations_perform = [Invocation_perform] ()
+                public private (set) var invocations_perform = [Invocation_perform] ()
 
                 public var handler_perform: (([Subject]) async throws -> [Subject])?
 
@@ -165,7 +165,7 @@ final class NoDepMockClassFactoryTests: XCTestCase {
                 public struct Invocation_getFeatures {
                     public let subjects: [Subject]
                 }
-                private (set) var invocations_getFeatures = [Invocation_getFeatures] ()
+                public private (set) var invocations_getFeatures = [Invocation_getFeatures] ()
 
                 public var handler_getFeatures: (([Subject]) async -> Features)?
 
@@ -212,7 +212,7 @@ final class NoDepMockClassFactoryTests: XCTestCase {
                 public struct Invocation_perform {
                     public let subjects: [Subject]
                 }
-                private (set) var invocations_perform = [Invocation_perform] ()
+                public private (set) var invocations_perform = [Invocation_perform] ()
 
                 public var handler_perform: (([Subject]) async throws -> [Subject])?
 
@@ -258,7 +258,7 @@ final class NoDepMockClassFactoryTests: XCTestCase {
                     public let item: any FloatingPoint
                     public let index: Int
                 }
-                private (set) var invocations_renderer = [Invocation_renderer] ()
+                public private (set) var invocations_renderer = [Invocation_renderer] ()
 
                 public var handler_renderer: ((AnyObject, any FloatingPoint, Int) -> Void)?
 
