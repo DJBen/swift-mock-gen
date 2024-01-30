@@ -47,9 +47,29 @@ public struct FunctionInvocationImplFactory {
                 )
             ),
             DeclSyntax(
-                protocolDecl.modifiers.isPublic ?
-                try VariableDeclSyntax("public private (set) var invocations_\(raw: funcUniqueName) = [Invocation_\(raw: funcUniqueName)]()") :
-                try VariableDeclSyntax("private (set) var invocations_\(raw: funcUniqueName) = [Invocation_\(raw: funcUniqueName)]()")
+                VariableDeclSyntax(
+                    attributes: [],
+                    modifiers: DeclModifierListSyntax {
+                        if protocolFunctionDecl.modifiers.isStatic {
+                            DeclModifierSyntax(name: .keyword(.static))
+                        }
+                        if protocolDecl.modifiers.isPublic {
+                            DeclModifierSyntax(name: .keyword(.public))
+                        }
+                        DeclModifierSyntax(
+                            name: .keyword(.private), 
+                            detail: DeclModifierDetailSyntax(detail: .identifier("set"))
+                        )
+                    },
+                    bindingSpecifier: .keyword(.var),
+                    bindings: PatternBindingListSyntax {
+                        PatternBindingSyntax(
+                            pattern: IdentifierPatternSyntax(identifier: "invocations_\(raw: funcUniqueName)"),
+                            initializer: InitializerClauseSyntax(value: ExprSyntax("[Invocation_\(raw: funcUniqueName)]()"))
+                        )
+
+                    }
+                )
             )
         ]
     }

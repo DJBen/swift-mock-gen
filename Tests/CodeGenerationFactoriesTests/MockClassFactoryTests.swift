@@ -373,6 +373,64 @@ final class MockClassFactoryTests: XCTestCase {
                         XCTFail("These invocations are made but not expected: fetchData(name: \(invocation.name))")
                     }
                 }
+                public struct Stub_shared {
+                    let returnValue: ServiceProtocol
+                    func matches(_ invocation: Invocation_shared) -> Bool {
+                        return true
+                    }
+                }
+                private (set) var expectations_shared: [(Stub_shared, Expectation?)] = []
+                public struct Invocation_shared {
+                }
+                static public private (set) var invocations_shared = [Invocation_shared] ()
+
+                static public func shared() -> ServiceProtocol {
+                    let invocation = Invocation_shared(
+
+                    )
+                    invocations_shared.append(invocation)
+                    for (stub, _) in expectations_shared.reversed() {
+                        return stub.returnValue
+                    }
+                    fatalError("Unexpected invocation of shared(). Could not continue without a return value. Did you stub it?")
+                }
+
+                public func stub_shared(andReturn value: ServiceProtocol) {
+                    expect_shared(
+                        andReturn: value,
+                        expectation: nil
+                    )
+                }
+
+                public func expect_shared(andReturn value: ServiceProtocol, expectation: Expectation?) {
+                    let stub = Stub_shared(
+                        returnValue: value
+                    )
+                    expectations_shared.append((stub, expectation))
+                }
+
+                public func verify_shared() {
+                    var invocations = invocations_shared
+                    for (stub, expectation) in expectations_shared.reversed() {
+                        var matchedCalls = 0
+                        var index = 0
+                        while index < invocations.count {
+                            if stub.matches(invocations[index]) {
+                                invocations.remove(at: index)
+                                matchedCalls += 1
+                            } else {
+                                index += 1
+                            }
+                        }
+                        expectation?.callCountPredicate.verify(
+                            methodSignature: #"shared()"#,
+                            callCount: matchedCalls
+                        )
+                    }
+                    for invocation in invocations {
+                        XCTFail("These invocations are made but not expected: shared()")
+                    }
+                }
             }
             """##
         )

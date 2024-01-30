@@ -39,6 +39,12 @@ extension DeclModifierListSyntax {
         })
     }
 
+    var isStatic: Bool {
+        contains(where: {
+            $0.name.text == TokenSyntax.keyword(.static).text
+        })
+    }
+
     func clearingScopeModifier() -> DeclModifierListSyntax {
         filter {
             $0.name.text != TokenSyntax.keyword(.public).text ||
