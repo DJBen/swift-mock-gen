@@ -60,6 +60,7 @@ enum TestCases {
             func initialize(name: String, secondName: String?)
             func fetchConfig() async throws -> [String: String]
             func fetchData(_ name: (String, count: Int)) async -> (() -> Void)
+            static func shared() -> ServiceProtocol
         }
         """#)
 

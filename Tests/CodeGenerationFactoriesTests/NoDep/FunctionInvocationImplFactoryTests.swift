@@ -56,4 +56,27 @@ final class FunctionInvocationImplFactoryTests: XCTestCase {
             """#
         )
     }
+
+    func test_static() throws {
+        let result = try MemberBlockItemListSyntax {
+            for member in try FunctionInvocationImplFactory().decls(
+                protocolDecl: TestCases.Case2.protocolDecl,
+                protocolFunctionDecl: try FunctionDeclSyntax(
+                    "static func shared() -> ConfigHeuristicRecoveryManager"
+                ),
+                funcUniqueName: "shared"
+            ) {
+                MemberBlockItemSyntax(decl: member)
+            }
+        }
+
+        assertBuildResult(
+            result,
+            #"""
+            public struct Invocation_shared {
+            }
+            static public private (set) var invocations_shared = [Invocation_shared] ()
+            """#
+        )
+    }
 }
