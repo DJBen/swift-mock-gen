@@ -13,9 +13,23 @@ public struct NoDepSourceFactory {
     public func decls(
         protocolDecl: ProtocolDeclSyntax,
         surroundWithPoundIfDebug: Bool,
+        excludeProtocols: [String],
         importDeclsToCopy: [ImportDeclSyntax],
-        customGenericTypes: [String: String]
+        customGenericTypes: [String: String],
+        onlyGenerateForPublicProtocols: Bool,
+        verbose: Bool
     ) throws -> [DeclSyntax] {
+        if excludeProtocols.contains(protocolDecl.name.trimmed.text) {
+            if verbose {
+                print("Skipping \(protocolDecl.name.trimmed.text)")
+            }
+            return []
+        }
+        
+        if onlyGenerateForPublicProtocols && !protocolDecl.modifiers.isPublic {
+            return []
+        }
+
         let classDecl = try mockClassFactory.classDecl(
             protocolDecl: protocolDecl,
             customGenericTypes: customGenericTypes

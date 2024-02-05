@@ -1,5 +1,3 @@
-// Copyright © 2024 Snap, Inc. All rights reserved.
-
 import XCTest
 @testable import CodeGenerationFactories
 import SwiftSyntax

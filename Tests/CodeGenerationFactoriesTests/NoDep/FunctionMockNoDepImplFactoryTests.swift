@@ -1,4 +1,3 @@
-
 import XCTest
 @testable import CodeGenerationFactories
 import SwiftSyntax
