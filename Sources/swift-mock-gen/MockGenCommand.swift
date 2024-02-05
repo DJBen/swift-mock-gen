@@ -32,6 +32,14 @@ struct MockGenArguments: ParsableArguments {
     )
     var transitiveProtocolConformance: Bool = true
 
+    @Flag(
+        name: [.customLong("only-public")],
+        help: """
+        Only generate mocks for public protocols if true.
+        """
+    )
+    var onlyGenerateForPublicProtocols: Bool = false
+
     @Option(
         name: [.long],
         help: """

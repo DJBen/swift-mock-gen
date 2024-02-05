@@ -107,12 +107,16 @@ struct GenerateNoDepMock: ParsableCommand, ParseCommand, MockGenCommand {
                     }
                     continue
                 }
+
                 let sourceFileSyntax = try SourceFileSyntax {
                     for decl in try NoDepSourceFactory().decls(
                         protocolDecl: protocolDecl,
                         surroundWithPoundIfDebug: surroundWithPoundIfDebug,
+                        excludeProtocols: mockGenArguments.excludeProtocols,
                         importDeclsToCopy: imports,
-                        customGenericTypes: customGenericTypeMap[protocolDecl.name.trimmed.text] ?? [:]
+                        customGenericTypes: customGenericTypeMap[protocolDecl.name.trimmed.text] ?? [:],
+                        onlyGenerateForPublicProtocols: mockGenArguments.onlyGenerateForPublicProtocols,
+                        verbose: arguments.verbose
                     ) {
                         decl
                     }
