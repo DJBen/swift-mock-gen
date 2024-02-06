@@ -47,7 +47,7 @@ def _generate_swift_mock_impl(ctx):
         args.append("-v")
     if ctx.attr.custom_generic_type_mappings:
         args += ["--custom-generic-types", ctx.attr.custom_generic_type_mappings]
-    if only_public:
+    if ctx.attr.only_public:
         args.append("--only-public")
 
     outputs = []

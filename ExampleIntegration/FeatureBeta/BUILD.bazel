@@ -25,6 +25,7 @@ generate_swift_mock_module(
     api_module = ":Example",
     srcs = glob(["Sources/**/*.swift"]),
     exclude_protocols = [],
+    only_public = True,
 )
 
 generate_swift_mock_module(
@@ -32,6 +33,7 @@ generate_swift_mock_module(
     srcs = glob(["Sources/**/*.swift"]),
     mock_module_name = "ExampleForAlphaMock",
     exclude_protocols = [],
+    only_public = True,
 )
 
 swift_test(
