@@ -206,4 +206,38 @@ final class VariableImplFactoryTests: XCTestCase {
             """##
         )
     }
+
+    func testGeneration_staticVariable() throws {
+        let result = try MemberBlockItemListSyntax {
+            for member in try VariableImplFactory().decls(
+                protocolDecl: try! ProtocolDeclSyntax(#"""
+                @objc public protocol SomeProtocol {
+                    static var global: SomeProtocol? { get }
+                }
+                """#),
+                protocolVariableDecl: try! VariableDeclSyntax(#"""
+                static var global: SomeProtocol? { get }
+                """#)
+            ) {
+                MemberBlockItemSyntax(decl: member)
+            }
+        }
+
+        assertBuildResult(
+            result,
+            ##"""
+
+
+            static public var global: SomeProtocol? {
+                get {
+                    getCount_global += 1
+                    return underlying_global
+                }
+            }
+            static var underlying_global: SomeProtocol!
+            static private (set) var getCount_global: Int = 0
+            static private (set) var setCount_global: Int = 0
+            """##
+        )
+    }
 }

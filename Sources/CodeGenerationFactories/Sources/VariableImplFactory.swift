@@ -31,9 +31,11 @@ public struct VariableImplFactory {
                         }
                     }(),
                     modifiers: DeclModifierListSyntax {
-                        // Append scope modifier to the function (public, internal, ...)
-                        if let scopeModifier = protocolDecl.modifiers.scopeModifier {
-                            scopeModifier.trimmed
+                        if protocolVariableDecl.modifiers.isStatic {
+                            DeclModifierSyntax(name: .keyword(.static))
+                        }
+                        if protocolDecl.modifiers.isPublic {
+                            DeclModifierSyntax(name: .keyword(.public))
                         }
                     },
                     bindingSpecifier: .keyword(.var),
