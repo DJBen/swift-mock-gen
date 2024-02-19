@@ -70,10 +70,14 @@ public struct VariableImplFactory {
                 // public var underlying_id: String!
                 VariableDeclSyntax(
                     attributes: [],
-                    modifiers: protocolVariableDecl.modifiers.removingSetterModifier()
-                        .removingWeakModifier()
-                        .removingOptionalModifier()
-                        .trimmed,
+                    modifiers: DeclModifierListSyntax {
+                        if protocolVariableDecl.modifiers.isStatic {
+                            DeclModifierSyntax(name: .keyword(.static))
+                        }
+                        if protocolDecl.modifiers.isPublic {
+                            DeclModifierSyntax(name: .keyword(.public))
+                        }
+                    },
                     bindingSpecifier: .keyword(.var),
                     bindingsBuilder: {
                         PatternBindingSyntax(
@@ -88,20 +92,19 @@ public struct VariableImplFactory {
                 // public private(set) var getCount_id: Int = 0
                 VariableDeclSyntax(
                     attributes: [],
-                    modifiers: {
-                        var getSetCountModifiers = protocolVariableDecl.modifiers.removingSetterModifier().removingWeakModifier()
-                            .removingOptionalModifier()
-                            .trimmed
+                    modifiers: DeclModifierListSyntax {
+                        if protocolVariableDecl.modifiers.isStatic {
+                            DeclModifierSyntax(name: .keyword(.static))
+                        }
+                        if protocolDecl.modifiers.isPublic {
+                            DeclModifierSyntax(name: .keyword(.public))
+                        }
 
-                        getSetCountModifiers.append(
-                            DeclModifierSyntax(
-                                name: .keyword(.private),
-                                detail: DeclModifierDetailSyntax(DeclModifierDetailSyntax(detail: TokenSyntax.identifier("set")))
-                            )
+                        DeclModifierSyntax(
+                            name: .keyword(.private),
+                            detail: DeclModifierDetailSyntax(DeclModifierDetailSyntax(detail: TokenSyntax.identifier("set")))
                         )
-
-                        return getSetCountModifiers
-                    }(),
+                    },
                     bindingSpecifier: .keyword(.var),
                     bindingsBuilder: {
                         PatternBindingSyntax(
@@ -115,20 +118,20 @@ public struct VariableImplFactory {
                 // public private(set) var setCount_id: Int = 0
                 VariableDeclSyntax(
                     attributes: [],
-                    modifiers: {
-                        var getSetCountModifiers = protocolVariableDecl.modifiers.removingSetterModifier().removingWeakModifier()
-                            .removingOptionalModifier()
-                            .trimmed
+                    modifiers: DeclModifierListSyntax {
+                        if protocolVariableDecl.modifiers.isStatic {
+                            DeclModifierSyntax(name: .keyword(.static))
+                        }
 
-                        getSetCountModifiers.append(
-                            DeclModifierSyntax(
-                                name: .keyword(.private),
-                                detail: DeclModifierDetailSyntax(DeclModifierDetailSyntax(detail: TokenSyntax.identifier("set")))
-                            )
+                        if protocolDecl.modifiers.isPublic {
+                            DeclModifierSyntax(name: .keyword(.public))
+                        }
+
+                        DeclModifierSyntax(
+                            name: .keyword(.private),
+                            detail: DeclModifierDetailSyntax(DeclModifierDetailSyntax(detail: TokenSyntax.identifier("set")))
                         )
-
-                        return getSetCountModifiers
-                    }(),
+                    },
                     bindingSpecifier: .keyword(.var),
                     bindingsBuilder: {
                         PatternBindingSyntax(

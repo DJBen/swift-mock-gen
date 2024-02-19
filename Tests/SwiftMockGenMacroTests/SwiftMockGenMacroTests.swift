@@ -77,9 +77,9 @@ final class SwiftMockGenMacroTests: XCTestCase {
                         return underlying_name
                     }
                 }
-                var underlying_name: String!
-                private (set) var getCount_name: Int = 0
-                private (set) var setCount_name: Int = 0
+                public var underlying_name: String!
+                public private (set) var getCount_name: Int = 0
+                public private (set) var setCount_name: Int = 0
 
                 public var anyProtocol: any Codable {
                     get {
@@ -91,9 +91,9 @@ final class SwiftMockGenMacroTests: XCTestCase {
                         underlying_anyProtocol = newValue
                     }
                 }
-                var underlying_anyProtocol: (any Codable)!
-                private (set) var getCount_anyProtocol: Int = 0
-                private (set) var setCount_anyProtocol: Int = 0
+                public var underlying_anyProtocol: (any Codable)!
+                public private (set) var getCount_anyProtocol: Int = 0
+                public private (set) var setCount_anyProtocol: Int = 0
 
                 public var secondName: String? {
                     get {
@@ -101,9 +101,9 @@ final class SwiftMockGenMacroTests: XCTestCase {
                         return underlying_secondName
                     }
                 }
-                var underlying_secondName: String!
-                private (set) var getCount_secondName: Int = 0
-                private (set) var setCount_secondName: Int = 0
+                public var underlying_secondName: String!
+                public private (set) var getCount_secondName: Int = 0
+                public private (set) var setCount_secondName: Int = 0
 
                 public var added: () -> Void {
                     get {
@@ -115,9 +115,9 @@ final class SwiftMockGenMacroTests: XCTestCase {
                         underlying_added = newValue
                     }
                 }
-                var underlying_added: (() -> Void)!
-                private (set) var getCount_added: Int = 0
-                private (set) var setCount_added: Int = 0
+                public var underlying_added: (() -> Void)!
+                public private (set) var getCount_added: Int = 0
+                public private (set) var setCount_added: Int = 0
 
                 public var removed: (() -> Void)? {
                     get {
@@ -129,9 +129,9 @@ final class SwiftMockGenMacroTests: XCTestCase {
                         underlying_removed = newValue
                     }
                 }
-                var underlying_removed: (() -> Void)!
-                private (set) var getCount_removed: Int = 0
-                private (set) var setCount_removed: Int = 0
+                public var underlying_removed: (() -> Void)!
+                public private (set) var getCount_removed: Int = 0
+                public private (set) var setCount_removed: Int = 0
                 public struct Invocation_initialize {
                     public let name: String
                     public let secondName: String?
