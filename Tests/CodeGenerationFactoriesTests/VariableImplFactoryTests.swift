@@ -26,9 +26,9 @@ final class VariableImplFactoryTests: XCTestCase {
                     return underlying_name
                 }
             }
-            var underlying_name: String!
-            private (set) var getCount_name: Int = 0
-            private (set) var setCount_name: Int = 0
+            public var underlying_name: String!
+            public private (set) var getCount_name: Int = 0
+            public private (set) var setCount_name: Int = 0
             """##
         )
     }
@@ -58,9 +58,9 @@ final class VariableImplFactoryTests: XCTestCase {
                     underlying_removed = newValue
                 }
             }
-            var underlying_removed: (() -> Void)!
-            private (set) var getCount_removed: Int = 0
-            private (set) var setCount_removed: Int = 0
+            public var underlying_removed: (() -> Void)!
+            public private (set) var getCount_removed: Int = 0
+            public private (set) var setCount_removed: Int = 0
             """##
         )
     }
@@ -92,9 +92,9 @@ final class VariableImplFactoryTests: XCTestCase {
                     return underlying_param
                 }
             }
-            var underlying_param: NSNumber!
-            private (set) var getCount_param: Int = 0
-            private (set) var setCount_param: Int = 0
+            public var underlying_param: NSNumber!
+            public private (set) var getCount_param: Int = 0
+            public private (set) var setCount_param: Int = 0
             """##
         )
     }
@@ -126,9 +126,9 @@ final class VariableImplFactoryTests: XCTestCase {
                     return underlying_param
                 }
             }
-            var underlying_param: Int!
-            private (set) var getCount_param: Int = 0
-            private (set) var setCount_param: Int = 0
+            public var underlying_param: Int!
+            public private (set) var getCount_param: Int = 0
+            public private (set) var setCount_param: Int = 0
             """##
         )
     }
@@ -164,9 +164,9 @@ final class VariableImplFactoryTests: XCTestCase {
                     underlying_delegate = newValue
                 }
             }
-            var underlying_delegate: SomeDelegate!
-            private (set) var getCount_delegate: Int = 0
-            private (set) var setCount_delegate: Int = 0
+            public var underlying_delegate: SomeDelegate!
+            public private (set) var getCount_delegate: Int = 0
+            public private (set) var setCount_delegate: Int = 0
             """##
         )
 
@@ -200,9 +200,9 @@ final class VariableImplFactoryTests: XCTestCase {
                     underlying_delegate = newValue
                 }
             }
-            var underlying_delegate: (Delegate1 & Delegate2 & Delegate3)!
-            private (set) var getCount_delegate: Int = 0
-            private (set) var setCount_delegate: Int = 0
+            public var underlying_delegate: (Delegate1 & Delegate2 & Delegate3)!
+            public private (set) var getCount_delegate: Int = 0
+            public private (set) var setCount_delegate: Int = 0
             """##
         )
     }
@@ -234,9 +234,9 @@ final class VariableImplFactoryTests: XCTestCase {
                     return underlying_global
                 }
             }
-            static var underlying_global: SomeProtocol!
-            static private (set) var getCount_global: Int = 0
-            static private (set) var setCount_global: Int = 0
+            static public var underlying_global: SomeProtocol!
+            static public private (set) var getCount_global: Int = 0
+            static public private (set) var setCount_global: Int = 0
             """##
         )
     }
