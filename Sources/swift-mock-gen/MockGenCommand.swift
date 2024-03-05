@@ -96,6 +96,34 @@ struct MockGenArguments: ParsableArguments {
             return dictionary
         }
     }
+
+    @Option(
+        name: [.long],
+        help: """
+        A JSON formatted map of a snippet to appended into the generated mock of each protocol.
+        
+        It is used to work around cases where protocol has out-of-module dependencies, in which the user may specify additional snippet to fulfill compilation requirement.
+
+        The mapping is in format of
+        `{"<ProtocolName>": "<Snippets>"}`
+        """
+    )
+    var customSnippets: String = "{}"
+
+    var customSnippetsMap: [String: String] {
+        get throws {
+            guard let data = customSnippets.data(using: .utf8) else {
+                throw JSONParsingError.invalidEncoding
+            }
+
+            let jsonObject = try JSONSerialization.jsonObject(with: data, options: [])
+            guard let dictionary = jsonObject as? [String: String] else {
+                throw JSONParsingError.unexpectedType
+            }
+
+            return dictionary
+        }
+    }
 }
 
 /// A command  that has arguments to parse source code

@@ -16,6 +16,7 @@ public struct NoDepSourceFactory {
         excludeProtocols: [String],
         importDeclsToCopy: [ImportDeclSyntax],
         customGenericTypes: [String: String],
+        customSnippet: String?,
         onlyGenerateForPublicProtocols: Bool,
         verbose: Bool
     ) throws -> [DeclSyntax] {
@@ -32,7 +33,8 @@ public struct NoDepSourceFactory {
 
         let classDecl = try mockClassFactory.classDecl(
             protocolDecl: protocolDecl,
-            customGenericTypes: customGenericTypes
+            customGenericTypes: customGenericTypes,
+            customSnippet: customSnippet
         )
         var decls = [DeclSyntax]()
 

@@ -4,6 +4,52 @@ import SwiftSyntax
 import CodeGenTesting
 
 final class NoDepMockClassFactoryTests: XCTestCase {
+    func testSnippets() throws {
+        let result = try NoDepMockClassFactory().classDecl(
+            protocolDecl: try! ProtocolDeclSyntax(
+            #"""
+            public protocol Networking: OutOfPackageDeps {
+                func performNetworking()
+            }
+            """#
+            ),
+            customSnippet: """
+            func outOfPackageDepFunction() {
+                // Satisfy out-of-package dep requirement
+            }
+            """
+        )
+
+        assertBuildResult(
+            result,
+            ##"""
+            public class NetworkingMock: Networking {
+
+                public init() {
+                }
+                public struct Invocation_performNetworking {
+                }
+                public private (set) var invocations_performNetworking = [Invocation_performNetworking] ()
+
+                public var handler_performNetworking: (() -> Void)?
+
+                public func performNetworking() {
+                    let invocation = Invocation_performNetworking(
+
+                    )
+                    invocations_performNetworking.append(invocation)
+                    if let handler = handler_performNetworking {
+                        handler()
+                    }
+                }
+                func outOfPackageDepFunction() {
+                    // Satisfy out-of-package dep requirement
+                }
+            }
+            """##
+        )
+    }
+
     func testGenerics_plain() throws {
         let result = try NoDepMockClassFactory().classDecl(
             protocolDecl: try! ProtocolDeclSyntax(
