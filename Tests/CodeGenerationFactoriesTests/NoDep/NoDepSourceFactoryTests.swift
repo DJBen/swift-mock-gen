@@ -20,6 +20,7 @@ final class NoDepSourceFactoryTests: XCTestCase {
             excludeProtocols: [],
             importDeclsToCopy: [],
             customGenericTypes: [:],
+            customSnippet: nil,
             onlyGenerateForPublicProtocols: true,
             verbose: false
         )

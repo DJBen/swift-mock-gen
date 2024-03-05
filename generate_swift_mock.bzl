@@ -47,6 +47,8 @@ def _generate_swift_mock_impl(ctx):
         args.append("-v")
     if ctx.attr.custom_generic_type_mappings:
         args += ["--custom-generic-types", ctx.attr.custom_generic_type_mappings]
+    if ctx.attr.custom_snippets:
+        args += ["--custom-snippets", ctx.attr.custom_snippets]
     if ctx.attr.only_public:
         args.append("--only-public")
 
@@ -82,6 +84,7 @@ generate_swift_mock = rule(
         "copy_imports": attr.bool(doc="Whether to copy imports"),
         "additional_imports": attr.string_list(doc="Additional modules to import; useful if you are compiling the generated files into a separate module, and thus needing to import the API module in which the protocols reside."),
         "custom_generic_type_mappings": attr.string(doc="A dict of custom generic type mappings. See 'Supplying custom generic types' in README for usages."),
+        "custom_snippets": attr.string(doc="A dict of a snippet to appended into the generated mock of each protocol. See 'swift-mock-gen gen -h' help option."),
         "exclude_protocols": attr.string_list(doc="List of protocols to exclude from protocol generation"),
         "only_public": attr.bool(doc="If true, only generate mocks for public protocols."),
         "srcs": attr.label_list(allow_files=True, doc="Source files"),
@@ -104,6 +107,7 @@ def generate_swift_mock_module(
     exclude_protocols = [],
     additional_imports = [],
     custom_generic_type_mappings = {},
+    custom_snippets = {},
     only_public = False,
     verbose = False,
     generate_swift_mock_tool = "@swift_mock_gen//:swift-mock-gen",
@@ -121,6 +125,7 @@ def generate_swift_mock_module(
         exclude_protocols (list): A str list of protocols that shall be excluded from mock generation. Use this if you encounter a problem in compilation.
         additional_imports (list): Additional imports to add to the mock.
         custom_generic_type_mappings (dict): A dict of custom generic type mappings. See 'Supplying custom generic types' in README for usages.
+        custom_snippets (dict): A dict of a snippet to appended into the generated mock of each protocol. See 'swift-mock-gen gen -h' help option.
         only_public (bool): If true, only generate mocks for public protocols.
         verbose (bool): Whether to print verbose debug messages to stdout.
         generate_swift_mock_tool (str): The label of the mock generation tool.
@@ -137,6 +142,7 @@ def generate_swift_mock_module(
         copy_imports = copy_imports,
         additional_imports = [api_module_name] + additional_imports,
         custom_generic_type_mappings = json.encode(custom_generic_type_mappings) if custom_generic_type_mappings else "",
+        custom_snippets = json.encode(custom_snippets) if custom_snippets else "",
         exclude_protocols = exclude_protocols,
         only_public = only_public,
         generate_swift_mock_tool = generate_swift_mock_tool,

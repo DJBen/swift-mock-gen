@@ -99,6 +99,7 @@ struct GenerateNoDepMock: ParsableCommand, ParseCommand, MockGenCommand {
             """)
 
             let customGenericTypeMap = try mockGenArguments.customGenericTypeMap
+            let customSnippetsMap = try mockGenArguments.customSnippetsMap
 
             for protocolDecl in protocolDecls {
                 if mockGenArguments.excludeProtocols.contains(protocolDecl.name.trimmed.text) {
@@ -115,6 +116,7 @@ struct GenerateNoDepMock: ParsableCommand, ParseCommand, MockGenCommand {
                         excludeProtocols: mockGenArguments.excludeProtocols,
                         importDeclsToCopy: imports,
                         customGenericTypes: customGenericTypeMap[protocolDecl.name.trimmed.text] ?? [:],
+                        customSnippet: customSnippetsMap[protocolDecl.name.trimmed.text],
                         onlyGenerateForPublicProtocols: mockGenArguments.onlyGenerateForPublicProtocols,
                         verbose: arguments.verbose
                     ) {

@@ -18,6 +18,7 @@ public enum SwiftMockGenMacro: PeerMacro {
             excludeProtocols: [],
             importDeclsToCopy: [],
             customGenericTypes: [:],
+            customSnippet: nil,
             onlyGenerateForPublicProtocols: false,
             verbose: false
         )
