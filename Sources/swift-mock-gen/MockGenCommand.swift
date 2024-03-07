@@ -15,6 +15,13 @@ struct MockGenArguments: ParsableArguments {
     var additionalImports: [String] = []
 
     @Option(
+        name: [.customLong("testable-imports")],
+        parsing: .upToNextOption,
+        help: "Similar to additional imports, but prefix the import with @testable."
+    )
+    var additionalTestableImports: [String] = []
+
+    @Option(
         name: [.long],
         parsing: .upToNextOption,
         help: "An list of protocols that are excluded from the mock generation."

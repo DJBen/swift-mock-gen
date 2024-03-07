@@ -35,7 +35,8 @@ struct GenerateNoDepMock: ParsableCommand, ParseCommand, MockGenCommand {
             let resolver = ProtocolDepResolver(fileIteratorProvider: sourceFiles)
             let (results, emptyFiles) = try resolver.inheritanceMergedProtocolDecls(
                 copyImports: copyImports,
-                additionalImports: mockGenArguments.additionalImports
+                additionalImports: mockGenArguments.additionalImports,
+                additionalTestableImports: mockGenArguments.additionalTestableImports
             )
             let protocolDeclResultGroupedByFileName = Dictionary(
                 grouping: results,
@@ -72,6 +73,10 @@ struct GenerateNoDepMock: ParsableCommand, ParseCommand, MockGenCommand {
 
                     for additionalImport in mockGenArguments.additionalImports {
                         imports.append(try ImportDeclSyntax("import \(raw: additionalImport)"))
+                    }
+
+                    for additionalTestableImport in mockGenArguments.additionalTestableImports {
+                        imports.append(try ImportDeclSyntax("@testable import \(raw: additionalTestableImport)"))
                     }
 
                     try processProtocolFile(

@@ -38,10 +38,12 @@ public struct ProtocolDepResolver {
     /// - Parameters:
     ///   - copyImports: Whether to copy the imports.
     ///   - additionalImports: Any additional modules to be imported.
+    ///   - additionalTestableImports: Any additional @testable imports.
     /// - Returns: A tuple consisting of processed results, and a list of empty files.
     public func inheritanceMergedProtocolDecls(
         copyImports: Bool,
-        additionalImports: [String] = []
+        additionalImports: [String] = [],
+        additionalTestableImports: [String] = []
     ) throws -> ([ProtocolDeclResult], [String]) {
         var fileIterator = fileIteratorProvider()
         var protocols = [String: ProtocolDeclResult]()
@@ -64,6 +66,10 @@ public struct ProtocolDepResolver {
 
                 for additionalImport in additionalImports {
                     imports.append(try ImportDeclSyntax("import \(raw: additionalImport)"))
+                }
+
+                for additionalTestableImport in additionalTestableImports {
+                    imports.append(try ImportDeclSyntax("@testable import \(raw: additionalTestableImport)"))
                 }
 
                 for codeBlockItemSyntax in tree.statements {
