@@ -34,7 +34,7 @@ Usage can be viewed by passing the `--help` or `-h` flag.
 ```bash
 OVERVIEW: Generate mock for given protocols in the provided source files. The generated mock needs no dependencies.
 
-USAGE: swift-mock-gen gen [<source-paths> ...] [--source <source>] [--output-dir <output-dir>] [-v] [--additional-imports <additional-imports> ...] [--exclude-protocols <exclude-protocols> ...] [--transitive-protocol-conformance] [--no-transitive-protocol-conformance] [--surround-with-pound-if-debug] [--no-surround-with-pound-if-debug] [--copy-imports]
+USAGE: swift-mock-gen gen [<options>] [<source-paths> ...]
 
 ARGUMENTS:
   <source-paths>          The source files and/or directories that should be parsed; use stdin if omitted
@@ -45,19 +45,61 @@ OPTIONS:
                           If provided, writes generated mocks to the output directory in lieu of stdout.
   -v                      Enables verbose debug outputs
   -i, --additional-imports <additional-imports>
-                          Additional modules to import; useful if you are compiling the generated files into a separate module, and thus
-                          needing to import the API module in which the protocols reside.
+                          Additional modules to import; useful if you are compiling the generated files into a separate module, and thus needing to import the API module in which the protocols reside.
+  --testable-imports <testable-imports>
+                          Similar to additional imports, but prefix the import with @testable.
   --exclude-protocols <exclude-protocols>
                           An list of protocols that are excluded from the mock generation.
   --transitive-protocol-conformance/--no-transitive-protocol-conformance
                           Support mocks of protocols with conformance to another protocol to be
                           generated correcly, as long as the dependent protocol is included.
                           Enabling this option may consume more memory. (default: --transitive-protocol-conformance)
+  --only-public           Only generate mocks for public protocols if true.
   --custom-generic-types <custom-generic-types>
-                          A JSON formatted map of custom generic types for each protocol... (default: {})
+                          A JSON formatted map of custom generic types for each protocol.
+                          It is used to specify a concrete type for the generic type requirement
+                          of the protocol. The mapping is in format of
+                          `{"<ProtocolName>": {"<GenericTypeName>": "<CustomType>", ...}, ...}`
+
+                          Given a protocol in the following example:
+                          ```
+                          public protocol Executor<Subject, Handler, ErrorType> {
+                              associatedtype Subject: ExecutorSubject
+                              associatedtype Handler: SomeHandler
+                              associatedtype ErrorType = Never
+                              func perform(_ subjects: [Subject]) async throws -> [Subject]
+                          }
+                          ```
+                          By default, a mock impl with generic parameters will be synthesized.
+                          ```
+                          public class ExecutorMock<P1: ExecutorSubject, P2: SomeHandler>: Executor {
+                              public typealias Subject = P1
+                              public typealias Handler = P2
+                              public typealias ErrorType = Never
+                              ...
+                          }
+                          ```
+                          If we specify a custom mapping like below,
+                          `{"Executor": {"Subject": "MySubject", "Handler": "MyHandler"}}`
+
+                          The generated mock's generic type requirements become the custom specified types.
+                          ```
+                          public class ExecutorMock: Executor {
+                              public typealias Subject = MySubject
+                              public typealias Handler = MyHandler
+                              public typealias ErrorType = Never
+                              ...
+                          }
+                          ``` (default: {})
+  --custom-snippets <custom-snippets>
+                          A JSON formatted map of a snippet to appended into the generated mock of each protocol.
+
+                          It is used to work around cases where protocol has out-of-module dependencies, in which the user may specify additional snippet to fulfill compilation requirement.
+
+                          The mapping is in format of
+                          `{"<ProtocolName>": "<Snippets>"}` (default: {})
   --surround-with-pound-if-debug/--no-surround-with-pound-if-debug
-                          Surround with #if DEBUG directives. This ensures the mock only be included in DEBUG targets. (default:
-                          --no-surround-with-pound-if-debug)
+                          Surround with #if DEBUG directives. This ensures the mock only be included in DEBUG targets. (default: --no-surround-with-pound-if-debug)
   --copy-imports          Copy the original imports from the source file.
   -h, --help              Show help information.
 ```
@@ -81,6 +123,8 @@ swift run swift-mock-gen gen ~/path/to/source.swift > ~/path/to/source.mock.swif
 swift run swift-mock-gen gen /dir1 /dir2 /path/to/source.swift --output-dir /output-dir --copy-imports
 ```
 The generated mock will be renamed to `<original_file_name>Mock.swift` for each input swift file. In this example, `--copy-imports` is added in order to successfully compile any transitive imports from the protocol. Note that transitive protocol conformances are supported; read the **Features** section to learn more.
+
+By default, the `swift-mock-gen` tool generate all `public` protocols; to exclude internal protocols, supply the `--only-public` argument.
 
 ### Integrating with Bazel build pipeline
 
@@ -226,6 +270,51 @@ One can leverage the `--custom-generic-types` argument to supply a custom type
 mapping. The mapping is in format of `{"<ProtocolName>": {"<GenericTypeName>": "<CustomType>", ...}, ...}`.
 
 In this example, one would supply `--custom-generic-types "{\"Executor\": {\"Subject\": \"MySubject\"}}"` to achieve the desired custom types.
+
+#### Function generics: type erasure
+
+When functions in the protocol has generics (example as followed), our mock cannot synthesize a blanket type. 
+
+```swift
+public protocol DataFetcher {
+    func fetchData<Model>(
+        dataFetchingRequest: DataFetchingRequest<Model>,
+        completion: @escaping ((Result<String, Error>) -> Void)
+    ) -> AnyCancellable
+}
+```
+
+Instead, the `DataFetchingRequest` in the protocol will be erased to `Any` to ensure a success compilation. The caller will bear the burden to typecast it back to `DataFetchingRequest<SomeModel>`.
+
+```swift
+public class DataFetcherMock: DataFetcher {
+
+    public init() {
+    }
+    public struct Invocation_fetchData {
+        public let dataFetchingRequest: Any
+        public let completion: ((Result<String, Error>) -> Void)
+    }
+    public private (set) var invocations_fetchData = [Invocation_fetchData] ()
+
+    public var handler_fetchData: ((Any, @escaping ((Result<String, Error>) -> Void)) -> AnyCancellable)?
+
+    public func fetchData<Model>(
+            dataFetchingRequest: DataFetchingRequest<Model>,
+            completion: @escaping ((Result<String, Error>) -> Void)
+        ) -> AnyCancellable {
+        let invocation = Invocation_fetchData(
+            dataFetchingRequest: dataFetchingRequest,
+            completion: completion
+        )
+        invocations_fetchData.append(invocation)
+        if let handler = handler_fetchData {
+            return handler(dataFetchingRequest, completion)
+        }
+        fatalError("Please set handler_fetchData")
+    }
+}
+```
 
 ### Transitive protocol conformances
 When a protocol conforms to another protocol, naive per-protocol generation would not include the methods of parent protocol.
