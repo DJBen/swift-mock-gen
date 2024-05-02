@@ -30,7 +30,9 @@ public struct FunctionHandlerNoDepImplFactory {
                         elements: TupleTypeElementListSyntax(
                             itemsBuilder: {
                                 TupleTypeElementSyntax(
-                                    type: protocolFunctionDecl.toVariableDeclFunctionType()
+                                    type: protocolFunctionDecl.toVariableDeclFunctionType(
+                                        funcDecl: protocolFunctionDecl
+                                    )
                                 )
                             }
                         )
@@ -45,9 +47,11 @@ public struct FunctionHandlerNoDepImplFactory {
 extension FunctionDeclSyntax {
     /// Turn the function signature to a variable return type.
     /// - Returns: The type converted to a variable style.
-    func toVariableDeclFunctionType() -> FunctionTypeSyntax {
+    func toVariableDeclFunctionType(
+        funcDecl: FunctionDeclSyntax
+    ) -> FunctionTypeSyntax {
         FunctionTypeSyntax(
-            parameters: TupleTypeElementListSyntax(itemsBuilder: {
+            parameters: TupleTypeElementListSyntax {
                 for param in signature.parameterClause.parameters {
                     if let identifierType = param.type.as(IdentifierTypeSyntax.self), let protocolConstraintType = genericParametersMap[identifierType.name.trimmed.text] {
                         TupleTypeElementSyntax(
@@ -57,10 +61,10 @@ extension FunctionDeclSyntax {
                             )
                         )
                     } else {
-                        TupleTypeElementSyntax(type: param.type)
+                        TupleTypeElementSyntax(type: param.type.eraseTypeIfContainingFunctionGenerics(funcDecl: funcDecl))
                     }
                 }
-            }),
+            },
             effectSpecifiers: signature.effectSpecifiers.map {
                 TypeEffectSpecifiersSyntax(
                     asyncSpecifier: $0.asyncSpecifier,

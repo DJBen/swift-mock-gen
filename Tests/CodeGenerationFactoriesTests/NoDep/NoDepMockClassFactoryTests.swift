@@ -91,6 +91,56 @@ final class NoDepMockClassFactoryTests: XCTestCase {
         )
     }
 
+    // If a mocked protocol has a method with generics, the method argument with the generics will be type erased.
+    // Knowing
+    func testGenericsInMethod_typeErasure() throws {
+        let result = try NoDepMockClassFactory().classDecl(
+            protocolDecl: try! ProtocolDeclSyntax(
+            #"""
+            public protocol DataFetcher {
+                func fetchData<Model>(
+                    dataFetchingRequest: DataFetchingRequest<Model>,
+                    completion: @escaping ((Result<String, Error>) -> Void)
+                ) -> AnyCancellable
+            }
+            """#
+            )
+        )
+
+        assertBuildResult(
+            result,
+            ##"""
+            public class DataFetcherMock: DataFetcher {
+
+                public init() {
+                }
+                public struct Invocation_fetchData {
+                    public let dataFetchingRequest: Any
+                    public let completion: ((Result<String, Error>) -> Void)
+                }
+                public private (set) var invocations_fetchData = [Invocation_fetchData] ()
+
+                public var handler_fetchData: ((Any, @escaping ((Result<String, Error>) -> Void)) -> AnyCancellable)?
+
+                public func fetchData<Model>(
+                        dataFetchingRequest: DataFetchingRequest<Model>,
+                        completion: @escaping ((Result<String, Error>) -> Void)
+                    ) -> AnyCancellable {
+                    let invocation = Invocation_fetchData(
+                        dataFetchingRequest: dataFetchingRequest,
+                        completion: completion
+                    )
+                    invocations_fetchData.append(invocation)
+                    if let handler = handler_fetchData {
+                        return handler(dataFetchingRequest, completion)
+                    }
+                    fatalError("Please set handler_fetchData")
+                }
+            }
+            """##
+        )
+    }
+
     // In this case, the associatedtype declares an equation.
     func testGenerics_equation() throws {
         let result = try NoDepMockClassFactory().classDecl(

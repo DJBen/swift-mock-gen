@@ -90,61 +90,27 @@ extension AccessorBlockSyntax {
     }
 }
 
-extension TypeSyntax {
-    /// Whether it is a function type syntax or attributed syntax that has an underlying function type syntax.
-    /// e.g. `@escaping () -> Void` or `(Int, String) -> Void`
-    var isFunctionTypeSyntax: Bool {
-        if self.is(FunctionTypeSyntax.self) {
-            return true
-        }
-        if let attr = self.as(AttributedTypeSyntax.self) {
-            return attr.baseType.is(FunctionTypeSyntax.self)
-        }
-        if let tuple = self.as(TupleTypeSyntax.self) {
-            if tuple.elements.count == 1, let firstElement = tuple.elements.first {
-                return firstElement.type.isFunctionTypeSyntax
+extension GenericArgumentClauseSyntax {
+    func containsAnySameGenericParameterType(_ genericParameterClause: GenericParameterClauseSyntax) -> Bool {
+        for otherParam in genericParameterClause.parameters {
+            for argument in arguments {
+                if let identifierType = argument.argument.as(IdentifierTypeSyntax.self) {
+                    if identifierType.name.trimmed.text == otherParam.name.trimmed.text {
+                        return true
+                    }
+                    if let innerGenericArgumentClause = identifierType.genericArgumentClause {
+                        if innerGenericArgumentClause.containsAnySameGenericParameterType(genericParameterClause) {
+                            return true
+                        }
+                    }
+                }
             }
-            return false
         }
         return false
     }
-
-    var underlyingFunctionTypeSyntax: FunctionTypeSyntax? {
-        if let funcTypeSyntax = self.as(FunctionTypeSyntax.self) {
-            return funcTypeSyntax
-        }
-        if let attr = self.as(AttributedTypeSyntax.self), let funcTypeSyntax = attr.baseType.as(FunctionTypeSyntax.self) {
-            return funcTypeSyntax
-        }
-        return nil
-    }
 }
 
-extension VariableDeclSyntax {
-    var hasAtObjcAttribute: Bool {
-        attributes.contains { attr in
-            switch attr {
-            case .attribute(let attrSyntax):
-                return attrSyntax.attributeName.as(IdentifierTypeSyntax.self)?.name.text == "objc"
-            default:
-                return false
-            }
-        }
-    }
-
-    var hasWeakModifier: Bool {
-        modifiers.contains { modifier in
-            switch modifier.name.tokenKind {
-            case .keyword(let value):
-                return value == .weak
-            default:
-                return false
-            }
-        }
-    }
-}
-
-extension TypeSyntax {
+extension TypeSyntaxProtocol {
     func toImplicitOptional() -> ImplicitlyUnwrappedOptionalTypeSyntax {
         if let optional = self.as(OptionalTypeSyntax.self) {
             return ImplicitlyUnwrappedOptionalTypeSyntax(wrappedType: optional.wrappedType)
@@ -206,8 +172,94 @@ extension TypeSyntax {
             return OptionalTypeSyntax(wrappedType: self)
         }
     }
+
+    /// Whether it is a function type syntax or attributed syntax that has an underlying function type syntax.
+    /// e.g. `@escaping () -> Void` or `(Int, String) -> Void`
+    var isFunctionTypeSyntax: Bool {
+        if self.is(FunctionTypeSyntax.self) {
+            return true
+        }
+        if let attr = self.as(AttributedTypeSyntax.self) {
+            return attr.baseType.is(FunctionTypeSyntax.self)
+        }
+        if let tuple = self.as(TupleTypeSyntax.self) {
+            if tuple.elements.count == 1, let firstElement = tuple.elements.first {
+                return firstElement.type.isFunctionTypeSyntax
+            }
+            return false
+        }
+        return false
+    }
+
+    var underlyingFunctionTypeSyntax: FunctionTypeSyntax? {
+        if let funcTypeSyntax = self.as(FunctionTypeSyntax.self) {
+            return funcTypeSyntax
+        }
+        if let attr = self.as(AttributedTypeSyntax.self), let funcTypeSyntax = attr.baseType.as(FunctionTypeSyntax.self) {
+            return funcTypeSyntax
+        }
+        return nil
+    }
+
+
+    func hasSameFuncGenericParameterType(funcDecl: FunctionDeclSyntax) -> Bool {
+        guard let funcGenerics = funcDecl.genericParameterClause else {
+            return false
+        }
+        if let optionalWrapped = self.as(OptionalTypeSyntax.self) {
+            return optionalWrapped.wrappedType.hasSameFuncGenericParameterType(funcDecl: funcDecl)
+        } else if let funcType = self.as(FunctionTypeSyntax.self) {
+            return funcType.parameters.map { $0.type.hasSameFuncGenericParameterType(funcDecl: funcDecl) }.reduce(true) { $0 && $1 } || funcType.returnClause.type.hasSameFuncGenericParameterType(funcDecl: funcDecl)
+        } else if let tupleType = self.as(TupleTypeSyntax.self) {
+            return tupleType.elements.map { $0.type.hasSameFuncGenericParameterType(funcDecl: funcDecl) }.reduce(true) { $0 && $1 }
+        }
+
+        guard let identifierType = self.as(IdentifierTypeSyntax.self) else {
+            return false
+        }
+
+        if let genericClause = identifierType.genericArgumentClause, genericClause.containsAnySameGenericParameterType(funcGenerics) {
+            return true
+        }
+
+        return false
+    }
+
+    /// If the function parameter contains a generic, then erase to `Any`.
+    func eraseTypeIfContainingFunctionGenerics(
+        funcDecl: FunctionDeclSyntax
+    ) -> any TypeSyntaxProtocol {
+        if hasSameFuncGenericParameterType(funcDecl: funcDecl) {
+            return IdentifierTypeSyntax(name: .keyword(.Any))
+        } else {
+            return self
+        }
+    }
 }
 
+extension VariableDeclSyntax {
+    var hasAtObjcAttribute: Bool {
+        attributes.contains { attr in
+            switch attr {
+            case .attribute(let attrSyntax):
+                return attrSyntax.attributeName.as(IdentifierTypeSyntax.self)?.name.text == "objc"
+            default:
+                return false
+            }
+        }
+    }
+
+    var hasWeakModifier: Bool {
+        modifiers.contains { modifier in
+            switch modifier.name.tokenKind {
+            case .keyword(let value):
+                return value == .weak
+            default:
+                return false
+            }
+        }
+    }
+}
 
 extension TypeAnnotationSyntax {
     func toOptional() -> TypeAnnotationSyntax {
