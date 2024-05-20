@@ -11,9 +11,19 @@ public struct ProtocolDeclResult: Equatable {
     func melding(into result: ProtocolDeclResult) -> ProtocolDeclResult {
         ProtocolDeclResult(
             decl: decl.melding(into: result.decl),
-            imports: result.imports,
+            imports: combine(imports, result.imports),
             fileName: result.fileName
         )
+    }
+
+    // Uniquely combine multiple import decl statements
+    private func combine(_ imports1: [ImportDeclSyntax], _ imports2: [ImportDeclSyntax]) -> [ImportDeclSyntax] {
+        var set: Set<String> = []
+        set.formUnion(imports1.map { $0.trimmed.formatted().description })
+        set.formUnion(imports2.map { $0.trimmed.formatted().description })
+        return Array(set).sorted().map {
+            try! ImportDeclSyntax("\(raw: $0)")
+        }
     }
 }
 
@@ -80,7 +90,10 @@ public struct ProtocolDepResolver {
                             fileName: sourceFile.fileName
                         )
                         protocolDeps.append(
-                            ProtocolDeps(name: protocolDecl.name.trimmed.text, deps: protocolDecl.conformedNonNSObjectProtocols)
+                            ProtocolDeps(
+                                name: protocolDecl.name.trimmed.text,
+                                deps: protocolDecl.conformedNonNSObjectProtocols
+                            )
                         )
                         isSourceFileEmpty = false
                     }
@@ -113,7 +126,10 @@ public struct ProtocolDepResolver {
         return (mergedResults, emptyFiles)
     }
 
-    func mergeProtocols(_ deps: [ProtocolDeps], protocols: inout [String: ProtocolDeclResult]) throws -> [ProtocolDeps] {
+    func mergeProtocols(
+        _ deps: [ProtocolDeps],
+        protocols: inout [String: ProtocolDeclResult]
+    ) throws -> [ProtocolDeps] {
         // Toposort Kahn algorithm
         // Find vertices with no predecessors and puts them into a new list.
         // These are the "leaders". The leaders array eventually becomes the
