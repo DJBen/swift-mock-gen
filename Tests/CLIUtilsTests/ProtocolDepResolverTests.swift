@@ -245,6 +245,95 @@ final class ProtocolDepResolverTests: XCTestCase {
         """#)
         XCTAssertEqual(protocols["P1"]!.decl.formatted().description, expectedP1.formatted().description)
     }
+
+    // NSObject shouldn't be visible in protocol inheritance.
+    func testMergeProtocols_NSObject() throws {
+        let resolver = ProtocolDepResolver(
+            fileIteratorProvider: { fatalError() }
+        )
+        var protocols: [String: ProtocolDeclResult] = [
+            "P2": ProtocolDeclResult(
+                try! ProtocolDeclSyntax(
+                #"""
+                protocol P2: P3 {
+                    func p2()
+                }
+                """#
+               )
+            ),
+            "P1": ProtocolDeclResult(
+                try! ProtocolDeclSyntax(
+                #"""
+                protocol P1: P2 {
+                    func p1()
+                }
+                """#
+               )
+            ),
+            "P3": ProtocolDeclResult(
+                try! ProtocolDeclSyntax(
+                #"""
+                protocol P3: NSObject, P4 {
+                    func p3()
+                }
+                """#
+               )
+            )
+        ]
+        let sortedDeps = try resolver.mergeProtocols(
+            [
+                ProtocolDeps(
+                    name: "P2",
+                    deps: ["P3"]
+                ),
+                ProtocolDeps(
+                    name: "P1",
+                    deps: ["P2"]
+                ),
+                ProtocolDeps(
+                    name: "P3",
+                    deps: []
+                )
+            ],
+            protocols: &protocols
+        )
+        XCTAssertEqual(
+            sortedDeps,
+            [
+                ProtocolDeps(
+                    name: "P3",
+                    deps: []
+                ),
+                ProtocolDeps(
+                    name: "P2",
+                    deps: ["P3"]
+                ),
+                ProtocolDeps(
+                    name: "P1",
+                    deps: ["P2"]
+                ),
+            ]
+        )
+        let expectedP2 = try! ProtocolDeclSyntax(#"""
+        protocol P2: P3 {
+            func p3()
+            func p2()
+        }
+        """#)
+        XCTAssertEqual(
+            protocols["P2"]!.decl.formatted().description,
+            expectedP2.formatted().description
+        )
+
+        let expectedP1 = try! ProtocolDeclSyntax(#"""
+        protocol P1: P2 {
+            func p3()
+            func p2()
+            func p1()
+        }
+        """#)
+        XCTAssertEqual(protocols["P1"]!.decl.formatted().description, expectedP1.formatted().description)
+    }
 }
 
 extension ProtocolDeclResult {

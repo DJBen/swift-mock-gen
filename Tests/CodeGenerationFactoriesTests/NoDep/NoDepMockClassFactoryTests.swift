@@ -4,6 +4,41 @@ import SwiftSyntax
 import CodeGenTesting
 
 final class NoDepMockClassFactoryTests: XCTestCase {
+    func testNSObjectProtocol() throws {
+        let result = try NoDepMockClassFactory().classDecl(
+            protocolDecl: try! ProtocolDeclSyntax(
+            #"""
+            public protocol Networking: NSObject {
+                func performNetworking()
+            }
+            """#
+            )
+        )
+
+        assertBuildResult(
+            result,
+            ##"""
+            public class NetworkingMock: NSObject, Networking {
+                public struct Invocation_performNetworking {
+                }
+                public private (set) var invocations_performNetworking = [Invocation_performNetworking] ()
+
+                public var handler_performNetworking: (() -> Void)?
+
+                public func performNetworking() {
+                    let invocation = Invocation_performNetworking(
+
+                    )
+                    invocations_performNetworking.append(invocation)
+                    if let handler = handler_performNetworking {
+                        handler()
+                    }
+                }
+            }
+            """##
+        )
+    }
+
     func testSnippets() throws {
         let result = try NoDepMockClassFactory().classDecl(
             protocolDecl: try! ProtocolDeclSyntax(

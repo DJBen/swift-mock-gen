@@ -17,7 +17,9 @@ extension AttributeListSyntax {
 extension ProtocolDeclSyntax {
     var isNSObjectProtocol: Bool {
         inheritanceClause?.inheritedTypes.contains(
-            where: { $0.type.as(IdentifierTypeSyntax.self)?.name.text == "NSObjectProtocol" }
+            where: {
+                $0.type.as(IdentifierTypeSyntax.self)?.name.text == "NSObjectProtocol" || $0.type.as(IdentifierTypeSyntax.self)?.name.text == "NSObject"
+            }
         ) ?? false
     }
 }
