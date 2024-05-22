@@ -137,6 +137,13 @@ final class NoDepMockClassFactoryTests: XCTestCase {
                     dataFetchingRequest: DataFetchingRequest<Model>,
                     completion: @escaping ((Result<String, Error>) -> Void)
                 ) -> AnyCancellable
+
+                @discardableResult
+                func fetchData2<Model: DataFetchable, ModelIdentifier: Hashable>(
+                    dataFetchingRequest: DataFetchingRequest<ModelIdentifier>,
+                    dataDeserializer: @escaping (Data) -> Model?,
+                    completion: @escaping ((Result<DataFetchingResponse<Model>, DataFetchingServiceError>) -> Void)
+                ) -> AnyCancellable
             }
             """#
             )
@@ -151,7 +158,7 @@ final class NoDepMockClassFactoryTests: XCTestCase {
                 }
                 public struct Invocation_fetchData {
                     public let dataFetchingRequest: Any
-                    public let completion: ((Result<String, Error>) -> Void)
+                    public let completion: Void
                 }
                 public private (set) var invocations_fetchData = [Invocation_fetchData] ()
 
@@ -163,13 +170,40 @@ final class NoDepMockClassFactoryTests: XCTestCase {
                     ) -> AnyCancellable {
                     let invocation = Invocation_fetchData(
                         dataFetchingRequest: dataFetchingRequest,
-                        completion: completion
+                        completion: ()
                     )
                     invocations_fetchData.append(invocation)
                     if let handler = handler_fetchData {
                         return handler(dataFetchingRequest, completion)
                     }
                     fatalError("Please set handler_fetchData")
+                }
+                public struct Invocation_fetchData2 {
+                    public let dataFetchingRequest: Any
+                    public let dataDeserializer: Void
+                    public let completion: Void
+                }
+                public private (set) var invocations_fetchData2 = [Invocation_fetchData2] ()
+
+                public var handler_fetchData2: ((Any, @escaping (Data) -> (any DataFetchable)?, @escaping ((Any) -> Void)) -> AnyCancellable)?
+
+                @discardableResult public func fetchData2<Model: DataFetchable, ModelIdentifier: Hashable>(
+                        dataFetchingRequest: DataFetchingRequest<ModelIdentifier>,
+                        dataDeserializer: @escaping (Data) -> Model?,
+                        completion: @escaping ((Result<DataFetchingResponse<Model>, DataFetchingServiceError>) -> Void)
+                    ) -> AnyCancellable {
+                    let invocation = Invocation_fetchData2(
+                        dataFetchingRequest: dataFetchingRequest,
+                        dataDeserializer: (),
+                        completion: ()
+                    )
+                    invocations_fetchData2.append(invocation)
+                    if let handler = handler_fetchData2 {
+                        return handler(dataFetchingRequest, dataDeserializer, {
+                                completion($0 as! Result<DataFetchingResponse<Model>, DataFetchingServiceError>)
+                            })
+                    }
+                    fatalError("Please set handler_fetchData2")
                 }
             }
             """##

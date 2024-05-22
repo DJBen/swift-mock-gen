@@ -61,7 +61,7 @@ extension FunctionDeclSyntax {
                             )
                         )
                     } else {
-                        TupleTypeElementSyntax(type: param.type.eraseTypeIfContainingFunctionGenerics(funcDecl: funcDecl))
+                        TupleTypeElementSyntax(type: param.type.eraseTypeWithinFunctionGenerics(funcDecl: funcDecl))
                     }
                 }
             },

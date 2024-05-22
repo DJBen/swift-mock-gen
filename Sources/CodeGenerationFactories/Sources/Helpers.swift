@@ -175,68 +175,183 @@ extension TypeSyntaxProtocol {
         }
     }
 
-    /// Whether it is a function type syntax or attributed syntax that has an underlying function type syntax.
-    /// e.g. `@escaping () -> Void` or `(Int, String) -> Void`
+
     var isFunctionTypeSyntax: Bool {
-        if self.is(FunctionTypeSyntax.self) {
-            return true
-        }
-        if let attr = self.as(AttributedTypeSyntax.self) {
-            return attr.baseType.is(FunctionTypeSyntax.self)
-        }
-        if let tuple = self.as(TupleTypeSyntax.self) {
-            if tuple.elements.count == 1, let firstElement = tuple.elements.first {
-                return firstElement.type.isFunctionTypeSyntax
-            }
-            return false
-        }
-        return false
+        underlyingFunctionTypeSyntax != nil
     }
 
+    /// The underlying function type syntax or attributed syntax that has an underlying function type syntax.
+    /// e.g. `@escaping () -> Void` or `(Int, String) -> Void`
     var underlyingFunctionTypeSyntax: FunctionTypeSyntax? {
         if let funcTypeSyntax = self.as(FunctionTypeSyntax.self) {
             return funcTypeSyntax
         }
-        if let attr = self.as(AttributedTypeSyntax.self), let funcTypeSyntax = attr.baseType.as(FunctionTypeSyntax.self) {
-            return funcTypeSyntax
+        if let attr = self.as(AttributedTypeSyntax.self) {
+            return attr.baseType.underlyingFunctionTypeSyntax
+        }
+        if let tuple = self.as(TupleTypeSyntax.self) {
+            if tuple.elements.count == 1, let firstElement = tuple.elements.first {
+                return firstElement.type.underlyingFunctionTypeSyntax
+            }
+            return nil
         }
         return nil
     }
 
-
-    func hasSameFuncGenericParameterType(funcDecl: FunctionDeclSyntax) -> Bool {
-        guard let funcGenerics = funcDecl.genericParameterClause else {
-            return false
-        }
-        if let optionalWrapped = self.as(OptionalTypeSyntax.self) {
-            return optionalWrapped.wrappedType.hasSameFuncGenericParameterType(funcDecl: funcDecl)
-        } else if let funcType = self.as(FunctionTypeSyntax.self) {
-            return funcType.parameters.map { $0.type.hasSameFuncGenericParameterType(funcDecl: funcDecl) }.reduce(true) { $0 && $1 } || funcType.returnClause.type.hasSameFuncGenericParameterType(funcDecl: funcDecl)
-        } else if let tupleType = self.as(TupleTypeSyntax.self) {
-            return tupleType.elements.map { $0.type.hasSameFuncGenericParameterType(funcDecl: funcDecl) }.reduce(true) { $0 && $1 }
-        }
-
-        guard let identifierType = self.as(IdentifierTypeSyntax.self) else {
-            return false
-        }
-
-        if let genericClause = identifierType.genericArgumentClause, genericClause.containsAnySameGenericParameterType(funcGenerics) {
-            return true
-        }
-
-        return false
-    }
-
-    /// If the function parameter contains a generic, then erase to `Any`.
-    func eraseTypeIfContainingFunctionGenerics(
+    /// Erase the type if it is contained within a function's generic argument.
+    /// It should follow the rules:
+    /// - if generic type is within some type, then the entire type is erased, e.g. `SomeType<GenericType>`
+    /// will be erased to `Any`.
+    /// - If generic type inherits some other type e.g. `ModelIdentifier: Hashable>`, and
+    /// the type isn't in a type's generic clause, the erasure will become `any <InheritedType>` like `any Hashable`.
+    /// - within a function or tuple, only the affected type will be erased.
+    func eraseTypeWithinFunctionGenerics(
         funcDecl: FunctionDeclSyntax
     ) -> any TypeSyntaxProtocol {
-        if hasSameFuncGenericParameterType(funcDecl: funcDecl) {
-            return IdentifierTypeSyntax(name: .keyword(.Any))
-        } else {
+        eraseTypeIfContainingFunctionGenerics(
+            funcDecl: funcDecl,
+            matchWithinGenerics: false
+        )
+    }
+
+    private func eraseTypeIfContainingFunctionGenerics(
+        funcDecl: FunctionDeclSyntax,
+        matchWithinGenerics: Bool
+    ) -> any TypeSyntaxProtocol{
+        guard let funcGenerics = funcDecl.genericParameterClause else {
             return self
         }
+
+        if let optionalWrapped = self.as(OptionalTypeSyntax.self) {
+            let type = optionalWrapped.wrappedType.eraseTypeIfContainingFunctionGenerics(
+                funcDecl: funcDecl,
+                matchWithinGenerics: matchWithinGenerics
+            )
+            if type.is(SomeOrAnyTypeSyntax.self) {
+                // wrap `any <..>` with parens
+                return OptionalTypeSyntax(
+                    wrappedType: TupleTypeSyntax(elements: TupleTypeElementListSyntax {
+                        TupleTypeElementSyntax(type: type)
+                    })
+                )
+            }
+            return OptionalTypeSyntax(
+                wrappedType: type
+            )
+        } else if var funcType = self.as(FunctionTypeSyntax.self) {
+            funcType.parameters = TupleTypeElementListSyntax {
+                for param in funcType.parameters {
+                    if matchWithinGenerics {
+                        TupleTypeElementSyntax(
+                            type: IdentifierTypeSyntax(name: .identifier("Any"))
+                        )
+                    } else {
+                        TupleTypeElementSyntax(
+                            type: param.type.eraseTypeIfContainingFunctionGenerics(
+                                funcDecl: funcDecl,
+                                matchWithinGenerics: matchWithinGenerics
+                            )
+                        )
+                    }
+                }
+            }
+            if matchWithinGenerics {
+                funcType.returnClause.type = TypeSyntax(IdentifierTypeSyntax(name: .identifier("Any")))
+            } else {
+                let returnType = funcType.returnClause.type.eraseTypeIfContainingFunctionGenerics(
+                    funcDecl: funcDecl,
+                    matchWithinGenerics: matchWithinGenerics
+                )
+                funcType.returnClause.type = TypeSyntax(returnType)
+            }
+            return funcType
+        } else if let tupleType = self.as(TupleTypeSyntax.self) {
+            return TupleTypeSyntax(
+                elements: TupleTypeElementListSyntax {
+                    for element in tupleType.elements {
+                        if matchWithinGenerics {
+                            TupleTypeElementSyntax(
+                                type: IdentifierTypeSyntax(name: .identifier("Any"))
+                            )
+                        } else {
+                            TupleTypeElementSyntax(
+                                type: element.type.eraseTypeIfContainingFunctionGenerics(
+                                    funcDecl: funcDecl,
+                                    matchWithinGenerics: matchWithinGenerics
+                                )
+                            )
+                        }
+                    }
+                }
+            )
+        } else if var attributedType = self.as(AttributedTypeSyntax.self) {
+            attributedType.baseType = TypeSyntax(
+                attributedType.baseType.eraseTypeIfContainingFunctionGenerics(
+                    funcDecl: funcDecl,
+                    matchWithinGenerics: matchWithinGenerics
+                )
+            )
+            return attributedType
+        }
+
+        guard var identifierType = self.as(IdentifierTypeSyntax.self) else {
+            return self
+        }
+
+        // If type is in the function generics list, 
+        // - if generics does not inherit anything, erase to Any
+        // - otherwise, erase to `any <InheritedProtocol>
+        if let funcGeneric = funcGenerics.parameters.first(where: { $0.name.trimmed.text == identifierType.name.trimmed.text }) {
+
+            if matchWithinGenerics {
+                return IdentifierTypeSyntax(name: .identifier("Any"))
+            }
+
+            if let funcGenericInheritedType = funcGeneric.inheritedType {
+                return SomeOrAnyTypeSyntax(
+                    someOrAnySpecifier: .keyword(.any).with(\.trailingTrivia, .space),
+                    constraint: funcGenericInheritedType
+                )
+            } else {
+                return IdentifierTypeSyntax(name: .identifier("Any"))
+            }
+        }
+
+        // If type has generic parameter that is in the function generics list, erase to any
+        if let genericClause = identifierType.genericArgumentClause {
+            var genericArgumentList: GenericArgumentListSyntax = []
+            for (index, argument) in genericClause.arguments.enumerated() {
+                let erasedType = argument.argument.eraseTypeIfContainingFunctionGenerics(
+                    funcDecl: funcDecl,
+                    matchWithinGenerics: true
+                )
+                if erasedType.formatted().description != argument.argument.formatted().description && erasedType.formatted().description.contains(/\bAny\b/) {
+                    return IdentifierTypeSyntax(name: .identifier("Any"))
+                }
+                genericArgumentList.append(
+                    GenericArgumentSyntax(
+                        argument: argument.argument.eraseTypeIfContainingFunctionGenerics(
+                            funcDecl: funcDecl,
+                            matchWithinGenerics: true
+                        ),
+                        trailingComma: index + 1 >= genericClause.arguments.count ? nil : .commaToken()
+                    )
+                )
+            }
+
+            identifierType.genericArgumentClause = GenericArgumentClauseSyntax(arguments: genericArgumentList)
+            return identifierType
+        }
+
+        return self
     }
+}
+
+private struct TypeErasureResult {
+    let type: any TypeSyntaxProtocol
+    let matchWithinGenerics: Bool
+
+
 }
 
 extension VariableDeclSyntax {

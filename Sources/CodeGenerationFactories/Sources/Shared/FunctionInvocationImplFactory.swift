@@ -31,7 +31,7 @@ public struct FunctionInvocationImplFactory {
                                 )
                             } else {
                                 let genericParametersMap = protocolFunctionDecl.genericParametersMap
-                                let type = funcParamSyntax.removingEscaping().type.eraseTypeIfContainingFunctionGenerics(funcDecl: protocolFunctionDecl)
+                                let type = funcParamSyntax.removingEscaping().type.eraseTypeWithinFunctionGenerics(funcDecl: protocolFunctionDecl)
                                 if let identifierType = type.as(IdentifierTypeSyntax.self), let protocolConstraintType = genericParametersMap[identifierType.name.trimmed.text] {
                                     let anyType = SomeOrAnyTypeSyntax(
                                         someOrAnySpecifier: .keyword(.any),
