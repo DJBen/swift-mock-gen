@@ -273,18 +273,22 @@ In this example, one would supply `--custom-generic-types "{\"Executor\": {\"Sub
 
 #### Function generics: type erasure
 
-When functions in the protocol has generics (example as followed), our mock cannot synthesize a blanket type. 
+When functions in the protocol has generics (example as followed), some types will be erased to ensure successful compilation.
 
 ```swift
 public protocol DataFetcher {
-    func fetchData<Model>(
-        dataFetchingRequest: DataFetchingRequest<Model>,
-        completion: @escaping ((Result<String, Error>) -> Void)
+    func fetchData<Model: DataFetchable, ModelIdentifier: Hashable>(
+        dataFetchingRequest: DataFetchingRequest<ModelIdentifier>,
+        dataDeserializer: @escaping (Data) -> Model?,
+        completion: @escaping ((Result<DataFetchingResponse<Model>, DataFetchingServiceError>) -> Void)
     ) -> AnyCancellable
 }
 ```
 
-Instead, the `DataFetchingRequest` in the protocol will be erased to `Any` to ensure a success compilation. The caller will bear the burden to typecast it back to `DataFetchingRequest<SomeModel>`.
+1. If a type's generic arguments references function generics, the type will be erased.
+For example, `Result<DataFetchingResponse<Model>, DataFetchingServiceError>` references `Model`, and the entire thing becomes `Any`.
+2. If a function generics inherit some protocol, and a type is standalone (not in generics), it becomes `any <Protocol>`. For example, `(Data) -> Model?` becomes `(Data) -> (any DataFetchable)?`.
+3. As a result, the handler will need to force cast the type-erased arguments into original types.
 
 ```swift
 public class DataFetcherMock: DataFetcher {
@@ -293,23 +297,24 @@ public class DataFetcherMock: DataFetcher {
     }
     public struct Invocation_fetchData {
         public let dataFetchingRequest: Any
-        public let completion: ((Result<String, Error>) -> Void)
     }
     public private (set) var invocations_fetchData = [Invocation_fetchData] ()
 
-    public var handler_fetchData: ((Any, @escaping ((Result<String, Error>) -> Void)) -> AnyCancellable)?
+    public var handler_fetchData: ((Any, @escaping (Data) -> (any DataFetchable)?, @escaping ((Any) -> Void)) -> AnyCancellable)?
 
-    public func fetchData<Model>(
-            dataFetchingRequest: DataFetchingRequest<Model>,
-            completion: @escaping ((Result<String, Error>) -> Void)
+    @discardableResult public func fetchData<Model: DataFetchable, ModelIdentifier: Hashable>(
+            dataFetchingRequest: DataFetchingRequest<ModelIdentifier>,
+            dataDeserializer: @escaping (Data) -> Model?,
+            completion: @escaping ((Result<DataFetchingResponse<Model>, DataFetchingServiceError>) -> Void)
         ) -> AnyCancellable {
         let invocation = Invocation_fetchData(
-            dataFetchingRequest: dataFetchingRequest,
-            completion: completion
+            dataFetchingRequest: dataFetchingRequest
         )
         invocations_fetchData.append(invocation)
         if let handler = handler_fetchData {
-            return handler(dataFetchingRequest, completion)
+            return handler(dataFetchingRequest, dataDeserializer, {
+                    completion($0 as! Result<DataFetchingResponse<Model>, DataFetchingServiceError>)
+                })
         }
         fatalError("Please set handler_fetchData")
     }
