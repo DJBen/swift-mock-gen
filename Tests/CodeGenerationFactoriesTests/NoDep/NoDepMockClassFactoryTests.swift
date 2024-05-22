@@ -158,7 +158,6 @@ final class NoDepMockClassFactoryTests: XCTestCase {
                 }
                 public struct Invocation_fetchData {
                     public let dataFetchingRequest: Any
-                    public let completion: Void
                 }
                 public private (set) var invocations_fetchData = [Invocation_fetchData] ()
 
@@ -169,8 +168,7 @@ final class NoDepMockClassFactoryTests: XCTestCase {
                         completion: @escaping ((Result<String, Error>) -> Void)
                     ) -> AnyCancellable {
                     let invocation = Invocation_fetchData(
-                        dataFetchingRequest: dataFetchingRequest,
-                        completion: ()
+                        dataFetchingRequest: dataFetchingRequest
                     )
                     invocations_fetchData.append(invocation)
                     if let handler = handler_fetchData {
@@ -180,8 +178,6 @@ final class NoDepMockClassFactoryTests: XCTestCase {
                 }
                 public struct Invocation_fetchData2 {
                     public let dataFetchingRequest: Any
-                    public let dataDeserializer: Void
-                    public let completion: Void
                 }
                 public private (set) var invocations_fetchData2 = [Invocation_fetchData2] ()
 
@@ -193,9 +189,7 @@ final class NoDepMockClassFactoryTests: XCTestCase {
                         completion: @escaping ((Result<DataFetchingResponse<Model>, DataFetchingServiceError>) -> Void)
                     ) -> AnyCancellable {
                     let invocation = Invocation_fetchData2(
-                        dataFetchingRequest: dataFetchingRequest,
-                        dataDeserializer: (),
-                        completion: ()
+                        dataFetchingRequest: dataFetchingRequest
                     )
                     invocations_fetchData2.append(invocation)
                     if let handler = handler_fetchData2 {

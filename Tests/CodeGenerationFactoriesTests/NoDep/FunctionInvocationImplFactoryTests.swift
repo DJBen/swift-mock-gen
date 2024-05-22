@@ -24,7 +24,6 @@ final class FunctionInvocationImplFactoryTests: XCTestCase {
             public struct Invocation_initialize {
                 public let name: String
                 public let secondName: String?
-                public let completion: Void
             }
             public private (set) var invocations_initialize = [Invocation_initialize] ()
             """#

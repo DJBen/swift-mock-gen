@@ -24,10 +24,10 @@ public struct FunctionMockNoDepImplFactory {
             genericWhereClause: protocolFunctionDecl.genericWhereClause,
             bodyBuilder: {
                 let parameters = protocolFunctionDecl.signature.parameterClause.parameters
-                let invocationInitializerParams = parameters.map { (funcParamSyntax: FunctionParameterSyntax) in
+                let invocationInitializerParams = parameters.compactMap { (funcParamSyntax: FunctionParameterSyntax) in
                     let name = (funcParamSyntax.secondName ?? funcParamSyntax.firstName).text
                     if funcParamSyntax.type.isFunctionTypeSyntax {
-                        return "\(name): ()"
+                        return nil
                     } else {
                         return "\(name): \(name)"
                     }

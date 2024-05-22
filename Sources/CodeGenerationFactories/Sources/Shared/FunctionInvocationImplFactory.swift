@@ -25,11 +25,7 @@ public struct FunctionInvocationImplFactory {
                     memberBlock: try MemberBlockSyntax {
                         for funcParamSyntax in parameters {
                             let name = (funcParamSyntax.secondName ?? funcParamSyntax.firstName).text
-                            if funcParamSyntax.type.isFunctionTypeSyntax {
-                                try VariableDeclSyntax(
-                                    "\(raw: modifiers) let \(raw: name): Void"
-                                )
-                            } else {
+                            if !funcParamSyntax.type.isFunctionTypeSyntax {
                                 let genericParametersMap = protocolFunctionDecl.genericParametersMap
                                 let type = funcParamSyntax.removingEscaping().type.eraseTypeWithinFunctionGenerics(funcDecl: protocolFunctionDecl)
                                 if let identifierType = type.as(IdentifierTypeSyntax.self), let protocolConstraintType = genericParametersMap[identifierType.name.trimmed.text] {
