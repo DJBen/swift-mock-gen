@@ -39,10 +39,12 @@ public struct FunctionMockNoDepImplFactory {
                 """)
                 ExprSyntax("invocations_\(raw: funcUniqueName).append(invocation)")
 
-                try IfExprSyntax("if let handler = handler_\(raw: funcUniqueName)") {
+                let anyParameterHasNameHandler = parameters.contains(where: { param in (param.secondName ?? param.firstName).text == "handler" })
+                let handlerLocalVariableName = anyParameterHasNameHandler ? "funcHandler" : "handler"
+                try IfExprSyntax("if let \(raw: handlerLocalVariableName) = handler_\(raw: funcUniqueName)") {
                     let expr: any ExprSyntaxProtocol = {
                         var expr: any ExprSyntaxProtocol = FunctionCallExprSyntax(
-                            calledExpression: DeclReferenceExprSyntax(baseName: .identifier("handler")),
+                            calledExpression: DeclReferenceExprSyntax(baseName: .identifier(handlerLocalVariableName)),
                             leftParen: .leftParenToken(),
                             arguments: LabeledExprListSyntax {
                                 for param in parameters {

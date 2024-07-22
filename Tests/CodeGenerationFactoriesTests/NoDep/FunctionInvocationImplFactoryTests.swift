@@ -78,4 +78,34 @@ final class FunctionInvocationImplFactoryTests: XCTestCase {
             """#
         )
     }
+    
+    func test_handlerNaming() throws {
+        let result = try MemberBlockItemListSyntax {
+            for member in try FunctionInvocationImplFactory().decls(
+                protocolDecl: try ProtocolDeclSyntax(
+                #"""
+                public protocol ServiceProtocol {
+                    func doThing(handler: ()-> Void)
+                }
+                """#
+                ),
+                protocolFunctionDecl: try FunctionDeclSyntax(
+                    "func doThing(handler: ()-> Void)"
+                ),
+                funcUniqueName: "doThing"
+            ) {
+                MemberBlockItemSyntax(decl: member)
+            }
+        }
+
+        assertBuildResult(
+            result,
+            #"""
+            public struct Invocation_doThing {
+            }
+            public private (set) var invocations_doThing = [Invocation_doThing] ()
+            """#
+        )
+        
+    }
 }

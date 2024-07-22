@@ -108,4 +108,31 @@ final class FunctionHandlerNoDepImplFactoryTests: XCTestCase {
             """#
         )
     }
+    
+    func test_handlerNaming() throws {
+        let result = try FunctionHandlerNoDepImplFactory().declaration(
+            protocolDecl: try ProtocolDeclSyntax(
+                #"""
+                public protocol ServiceProtocol {
+                    func doThing(handler: ()-> Void)
+                }
+                """#
+            ),
+            protocolFunctionDecl: try FunctionDeclSyntax(
+                """
+                func doThing(handler: ()-> Void)
+                """
+            ),
+            funcUniqueName: "doThing"
+        )
+
+        assertBuildResult(
+            result,
+            #"""
+            
+            
+            public var handler_doThing: ((() -> Void) -> Void)?
+            """#
+        )
+    }
 }
