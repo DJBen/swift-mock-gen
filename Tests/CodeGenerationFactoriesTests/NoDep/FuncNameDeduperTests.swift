@@ -11,19 +11,19 @@ final class FuncNameDeduperTests: XCTestCase {
 
         // func reportError(_ error: Error)
         let func1 = TestCases.Case3.funcDecls[0]
-        XCTAssertEqual(deduper.name(for: func1), "reportError")
+        XCTAssertEqual(deduper.name(for: func1), "reportErrorError")
 
         // func reportError(_ error: Error, description: String)
         let func2 = TestCases.Case3.funcDecls[1]
-        XCTAssertEqual(deduper.name(for: func2), "reportErrorDescription")
+        XCTAssertEqual(deduper.name(for: func2), "reportErrorErrorDescription")
 
         // func reportError(_ error: Error, metadata: [String: Any]?)
         let func3 = TestCases.Case3.funcDecls[2]
-        XCTAssertEqual(deduper.name(for: func3), "reportErrorMetadata")
+        XCTAssertEqual(deduper.name(for: func3), "reportErrorErrorMetadata")
 
         // func reportError(_ error: Error, metadata: [String: Any]?, completion: @escaping () -> Void)
         let func4 = TestCases.Case3.funcDecls[3]
-        XCTAssertEqual(deduper.name(for: func4), "reportErrorMetadataCompletion")
+        XCTAssertEqual(deduper.name(for: func4), "reportErrorErrorMetadataCompletion")
     }
 
     func testDeduper_case2() throws {
@@ -34,6 +34,57 @@ final class FuncNameDeduperTests: XCTestCase {
 
         let func1 = TestCases.Case1.functionDecl
         XCTAssertEqual(deduper.name(for: func1), "performRequest")
+    }
+    
+    func testDeduper_secondName() throws {
+        let func1 = try! FunctionDeclSyntax(
+            #"""
+            func createDoc(
+                from image: UIImage,
+                creationDate: Date
+            ) -> Future<Document>
+            """#
+        )
+        let func2 = try! FunctionDeclSyntax(
+            #"""
+            func createDoc(
+                from video: AVAsset,
+                creationDate: Date
+            ) -> Future<Document>
+            """#
+        )
+        
+        let protocolDecl = try! ProtocolDeclSyntax(
+        #"""
+        @objc
+        public protocol DocumentCreator: NSObjectProtocol {
+            func createDoc(
+                from image: UIImage,
+                creationDate: Date
+            ) -> Future<Document>
+        
+            func createDoc(
+                from video: AVAsset,
+                creationDate: Date
+            ) -> Future<Document>
+        }
+        """#
+        )
+
+        let deduper = FuncNameDeduper(
+            protocolDecl: protocolDecl,
+            funcDecls: [func1, func2]
+        )
+
+        XCTAssertEqual(
+            deduper.name(for: func1),
+            "createDocImage"
+        )
+        
+        XCTAssertEqual(
+            deduper.name(for: func2),
+            "createDocVideo"
+        )
     }
 
     func testDeduper_wildcard() throws {
@@ -66,7 +117,7 @@ final class FuncNameDeduperTests: XCTestCase {
 
         XCTAssertEqual(
             deduper.name(for: func1),
-            "log"
+            "logError"
         )
 
         XCTAssertEqual(

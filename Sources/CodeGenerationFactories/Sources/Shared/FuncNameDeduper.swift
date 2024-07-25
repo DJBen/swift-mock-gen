@@ -1,37 +1,49 @@
+import Foundation
 import SwiftSyntax
 
 /// Deduplicates function signatures and generates a unique name for the function signature.
 struct FuncNameDeduper {
-    let funcNameMaps: [FuncNameDescriptor: String]
+    private(set) var funcNameMaps: [FuncNameDescriptor: IndexPath]
 
     init(
         protocolDecl: ProtocolDeclSyntax,
         funcDecls: [FunctionDeclSyntax]
     ) {
-        self.funcNameMaps = protocolDecl.memberBlock.members.compactMap { member -> FuncNameDescriptor? in
+        funcNameMaps = [:]
+        
+        protocolDecl.memberBlock.members.compactMap { member -> FuncNameDescriptor? in
             guard let funcDecl = member.decl.as(FunctionDeclSyntax.self) else {
                 return nil
             }
             return FuncNameDescriptor(funcDecl: funcDecl)
         }
-        .sorted(by: { $0.paramNames.count < $1.paramNames.count })
-        .reduce(into: [FuncNameDescriptor: String]()) { existingSignatureNameMap, funcNameDescriptor in
+        .sorted()
+        .forEach { funcNameDescriptor in
             // Generated type e.g. Invocation_#func_name# deduplication in case of same method name.
             // Will keep attaching param names until the name is unique.
-            for count in 0...funcNameDescriptor.paramNames.count {
-                let trimmedFuncNameDescriptor = funcNameDescriptor.keepingParams(count)
-                let funcNameExists = existingSignatureNameMap.contains { _, str in
-                    trimmedFuncNameDescriptor.description == str
+            var indexPath = IndexPath()
+            funcNameMaps[funcNameDescriptor] = indexPath
+            for existingDescriptor in funcNameMaps.keys {
+                if funcNameDescriptor == existingDescriptor {
+                    continue
                 }
-                if !funcNameExists {
-                    existingSignatureNameMap[funcNameDescriptor] = trimmedFuncNameDescriptor.description
-                    break
+                var existingIndexPath = funcNameMaps[existingDescriptor]!
+                while existingDescriptor.description(existingIndexPath) == funcNameDescriptor.description(indexPath) {
+                    // Because it is sorted, incrementing the latter should always yields a hit
+                    indexPath = funcNameDescriptor.nextIndexPath(indexPath)!
+                    existingIndexPath = existingDescriptor.nextIndexPath(existingIndexPath) ?? existingIndexPath
                 }
+                funcNameMaps[existingDescriptor] = existingIndexPath
+                funcNameMaps[funcNameDescriptor] = indexPath
             }
         }
     }
 
     func name(for funcDecl: FunctionDeclSyntax) -> String {
-        funcNameMaps[FuncNameDescriptor(funcDecl: funcDecl)] ?? funcDecl.name.text
+        let descriptor = FuncNameDescriptor(funcDecl: funcDecl)
+        guard let indexPath = funcNameMaps[descriptor] else {
+            return funcDecl.name.trimmed.text
+        }
+        return descriptor.description(indexPath)
     }
 }
