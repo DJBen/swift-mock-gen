@@ -125,4 +125,78 @@ final class FuncNameDeduperTests: XCTestCase {
             "logCheckpoint"
         )
     }
+    
+    func testDeduper_wildcard2() throws {
+        let func1 = try! FunctionDeclSyntax(
+            #"""
+            func set(_ anObject: Any?, forKey aKey: String)
+            """#
+        )
+
+        let func2 = try! FunctionDeclSyntax(
+            #"""
+            func set(_ value: Bool, forKey aKey: String)
+            """#
+        )
+        
+        let func3 = try! FunctionDeclSyntax(
+            #"""
+            func set(_ aData: Data?, forKey aKey: String)
+            """#
+        )
+        
+        let func4 = try! FunctionDeclSyntax(
+            #"""
+            func set(_ aDictionary: [String: Any]?, forKey aKey: String)
+            """#
+        )
+        
+        let func5 = try! FunctionDeclSyntax(
+            #"""
+            func set(_ value: Double, forKey aKey: String)
+            """#
+        )
+
+        let protocolDecl = try! ProtocolDeclSyntax(
+        #"""
+        public protocol KVStore {
+            func set(_ anObject: Any?, forKey aKey: String)
+            func set(_ value: Bool, forKey aKey: String)
+            func set(_ aData: Data?, forKey aKey: String)
+            func set(_ aDictionary: [String: Any]?, forKey aKey: String)
+            func set(_ value: Double, forKey aKey: String)
+        }
+        """#
+        )
+
+        let deduper = FuncNameDeduper(
+            protocolDecl: protocolDecl,
+            funcDecls: [func1, func2, func3, func4, func5]
+        )
+
+        XCTAssertEqual(
+            deduper.name(for: func1),
+            "setAnObject"
+        )
+
+        XCTAssertEqual(
+            deduper.name(for: func2),
+            "setValue"
+        )
+        
+        XCTAssertEqual(
+            deduper.name(for: func3),
+            "setAData"
+        )
+        
+        XCTAssertEqual(
+            deduper.name(for: func4),
+            "setADictionary"
+        )
+        
+        XCTAssertEqual(
+            deduper.name(for: func5),
+            "setValue1"
+        )
+    }
 }
