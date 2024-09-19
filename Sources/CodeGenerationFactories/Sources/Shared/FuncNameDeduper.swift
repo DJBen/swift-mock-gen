@@ -36,6 +36,10 @@ struct FuncNameDeduper {
         // Populate index path
         uniqueFuncNameDescriptors.forEach { funcNameMaps[$0] = IndexPath() }
         
+        if uniqueFuncNameDescriptors.isEmpty {
+            return
+        }
+        
         // For each pair of descriptor, increment them both if their names collide
         for i in 0..<uniqueFuncNameDescriptors.count - 1 {
             for j in 1..<uniqueFuncNameDescriptors.count {
