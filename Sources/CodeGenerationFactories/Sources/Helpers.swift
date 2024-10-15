@@ -12,6 +12,17 @@ extension AttributeListSyntax {
             }
         }
     }
+    
+    var availabilityAttributes: AttributeListSyntax {
+        filter { attr in
+            switch attr {
+            case .attribute(let attrSyntax):
+                return attrSyntax.attributeName.as(IdentifierTypeSyntax.self)?.name.text == "available"
+            default:
+                return false
+            }
+        }
+    }
 }
 
 extension ProtocolDeclSyntax {

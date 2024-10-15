@@ -53,6 +53,9 @@ public struct NoDepMockClassFactory {
         )
 
         return try ClassDeclSyntax(
+            attributes: AttributeListSyntax {
+                protocolDecl.attributes.availabilityAttributes
+            },
             modifiers: protocolScopeModifiers,
             name: "\(raw: name)",
             genericParameterClause: genericParamsDeclsResult.genericParameterClause,
